@@ -1,0 +1,97 @@
+html {
+    font-family: 'Poppins', sans-serif;
+}
+
+
+[class *="row"] {
+    display: flex;
+    margin: auto;
+    margin: 0 10%;
+}
+
+/*Clearfixes*/
+[class *="row"]::after {
+    display: block;
+    clear: both;
+    content: "";
+    content: none;
+}
+
+.clearfix::after {
+    display: block;
+    clear: both;
+    content: "";
+    content: none;
+}
+
+
+* {
+    box-sizing: border-box;
+   border-style: solid;
+    font-family: 'Poppins', sans-serif;
+}
+
+
+/*Defined an extra .col-4a class because most of the rows/elements on the page are in 3 columns. A width of 31.5% gives that perfect spacing in between the columns. Applying justify-content of space-between spaces them perfectly, instead of having to play around with margins and padding. */
+
+.col-1 {width: 8.33%;}
+.col-2 {width: 16.66%;}
+.col-3 {width: 25%;}
+.col-4 {width: 33.33%;}
+.col-4a {width: 31.5%;}
+.col-5 {width: 41.66%;}
+.col-6 {width: 50%;}
+.col-7 {width: 58.33%;}
+.col-8 {width: 66.66%;}
+.col-9 {width: 75%;}
+.col-10 {width: 83.33%;}
+.col-11 {width: 91.66%;}
+.col-12 {width: 100%;}
+.col-plan {width: 30%;}
+
+/*Apply flex as a class on html elements*/
+.flex {
+    display: flex;
+}
+
+.flex-column {
+    display: flex;
+    flex-direction: column;
+}
+
+a {
+    text-decoration: none;
+    color: #000000;
+}
+
+/*VARIABLES*/
+/*variable to change accent color for whole page*/
+:root {
+    --accentColor: #006622;
+}
+
+.searchBar {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.searchIcon svg:hover {
+  fill: var(--accentColor);
+}
+
+.foodItem {
+  justify-content: space-between;
+
+}
+
+.itemWeight {
+  width: 50px;
+}
+
+.itemQuantity {
+  width: 30px;
+}
+
+.selectedItemEdits > * {
+  margin: 0 5px;
+}
