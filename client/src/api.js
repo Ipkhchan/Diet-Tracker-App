@@ -5,6 +5,9 @@ const dietTracker = {};
 //modules in variables. If not, how can external programs access those variables?
 dietTracker.searchResults = [];
 dietTracker.nutrientTracker = [];
+//this collects the names of the selected food items that the user makes changes
+//to so that we can update those food items when saving.
+dietTracker.itemsUpdated = [];
 
 //IDs and Keys
 dietTracker.Id = "3c51cd82"
@@ -94,11 +97,13 @@ dietTracker.addNutrientInfo = function(nutrientInfo) {
   const foodItem = nutrientInfo.food_name;
   dietTracker.nutrientTracker[foodItem]= {};
   dietTracker.nutrientTracker[foodItem].name = foodItem;
+  //quantity is 1 by default
+  dietTracker.nutrientTracker[foodItem].quantity = 1;
   dietTracker.nutrientTracker[foodItem].amount = nutrientInfo.serving_weight_grams;
-  Object.defineProperty(dietTracker.nutrientTracker[foodItem],"defaultServingSize", {
-    value: nutrientInfo.serving_weight_grams,
-    enumerable: false
-  })
+  // Object.defineProperty(dietTracker.nutrientTracker[foodItem],"defaultServingSize", {
+  //   value: nutrientInfo.serving_weight_grams,
+  //   enumerable: false
+  // })
   // dietTracker.nutrientTracker[foodItem].nutrients = [];
   nutrientInfo = nutrientInfo.full_nutrients.filter(nutrient => dietTracker.filterTrackedNutrients(nutrient));
   // console.log(nutrientInfo);

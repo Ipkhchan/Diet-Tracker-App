@@ -3,6 +3,7 @@ var Schema = mongoose.Schema;
 
 var UserDailyDietSchema = new Schema({
     name: String,
+    quantity: Number,
     amount: Number,
     protein: Number,
     fat: Number,

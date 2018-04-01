@@ -29,12 +29,14 @@ module.exports.add_fooditem_data = function(req, res, next) {
     res.append('Access-Control-Allow-Headers', 'Content-Type');
     res.send("Saved!")
   };
-
-  // userDailyDiet.find(function(err, foodItems) {
-  //   if (err) console.log(err);
-  //   res.append('Access-Control-Allow-Origin', ['*']);
-  //   res.append('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
-  //   res.append('Access-Control-Allow-Headers', 'Content-Type');
-  //   res.json(foodItems);
-  // });
 };
+
+module.exports.get_fooditem_data = function(req, res, next) {
+  userDailyDiet.find({}, {'_id': 0, '__v': 0}, function(err, foodItems) {
+    if (err) console.log(err);
+    res.append('Access-Control-Allow-Origin', ['*']);
+    res.append('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+    res.append('Access-Control-Allow-Headers', 'Content-Type');
+    res.json(foodItems);
+  });
+}

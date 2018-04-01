@@ -25,9 +25,26 @@ class App extends Component {
     this.handleKeyPress = this.handleKeyPress.bind(this);
     this.handleSelectItem = this.handleSelectItem.bind(this);
     this.saveDietData = this.saveDietData.bind(this);
-    this.state = {nutritionData: dietTracker.nutrientTracker, searchResults: dietTracker.searchResults};
+    this.state = {nutritionData: {}, searchResults: []};
   }
 
+  componentDidMount() {
+    $.ajax({
+      url: 'http://localhost:5000/users/',
+      method:'GET',
+      dataType:'JSON'
+    }).then((res) => {
+      console.log(res);
+      res.forEach(function(foodItem) {
+        dietTracker.nutrientTracker[foodItem.name] = foodItem
+      });
+      this.setState({nutritionData: dietTracker.nutrientTracker});
+      console.log(this.state.nutritionData);
+    });
+  }
+
+  //this handles changing the nutrition values based on the food quantity that
+  //the user inputs
   handleNutritionDataChange(e) {
     const foodItem = e.target.parentNode.dataset.fooditem;
     const nutritionData = this.state.nutritionData;
@@ -40,26 +57,24 @@ class App extends Component {
         delete nutritionData[foodItem];
         break;
       case "itemQuantity":
-        const currentQuantity = itemData.amount/itemData.defaultServingSize;
+        const quantityRatio = e.target.value/itemData.quantity;
         for (const category in itemData) {
           if (typeof itemData[category] == "number") {
-            itemData[category] *= e.target.value/currentQuantity;
-
+            itemData[category] *= quantityRatio;
           }
         }
         break;
       case "itemWeight":
-        const ratio = e.target.value/itemData.amount;
+        const weightRatio = e.target.value/itemData.amount;
         if (e.target.value > 0) {
           for (const category in itemData) {
             if (typeof itemData[category] == "number") {
-              itemData[category] *= ratio;
+              itemData[category] *= weightRatio;
             }
           }
         }
         break;
     }
-    console.log(nutritionData);
     this.setState({nutritionData: nutritionData});
   }
 
@@ -100,6 +115,7 @@ class App extends Component {
   saveDietData(e) {
     if (Object.keys(dietTracker.nutrientTracker).length) {
       console.log("yep");
+      console.log(dietTracker.nutrientTracker);
       $.ajax({
         url: 'http://localhost:5000/users/',
         method:'POST',
@@ -222,15 +238,16 @@ class SelectedItemsList extends Component {
   }
 
   render() {
+      const nutritionData = this.props.nutritionData;
       return (
         <ul>
-          {Object.keys(this.props.nutritionData).map((foodItem) =>
+          {Object.keys(nutritionData).map((foodItem) =>
             <li key={"select" + foodItem} className = "foodItem flex">
-              {foodItem}
+              {nutritionData[foodItem].name}
               <div className = "flex edits" data-fooditem = {foodItem}  onChange = {this.handleChange}>
                 <input type="number" defaultValue="1" min="1" className="itemQuantity"></input>
                 <p>units or</p>
-                <input type="number" defaultValue={this.props.nutritionData[foodItem].amount} min="1" className="itemWeight"></input>
+                <input type="number" defaultValue={nutritionData[foodItem].amount} min="1" className="itemWeight"></input>
                 <p>grams</p>
                 <button type="button" className="removeItem" onClick = {this.handleChange}>X</button>
               </div>
