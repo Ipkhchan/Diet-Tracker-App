@@ -12,11 +12,14 @@
     "debug": "~2.6.9",
     "express": "~4.16.0",
     "http-errors": "~1.6.2",
+    "jade": "^1.11.0",
+    "mongoose": "^5.0.12",
     "morgan": "~1.9.0",
     "pug": "^2.0.3"
   },
-  "proxy": "http://localhost:5000/",
   "devDependencies": {
-    "concurrently": "^3.5.1"
+    "concurrently": "^3.5.1",
+    "eslint": "^4.19.1",
+    "eslint-config-google": "^0.9.1"
   }
 }

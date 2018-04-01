@@ -24,6 +24,7 @@ class App extends Component {
     this.handleSearch = this.handleSearch.bind(this);
     this.handleKeyPress = this.handleKeyPress.bind(this);
     this.handleSelectItem = this.handleSelectItem.bind(this);
+    this.saveDietData = this.saveDietData.bind(this);
     this.state = {nutritionData: dietTracker.nutrientTracker, searchResults: dietTracker.searchResults};
   }
 
@@ -88,54 +89,86 @@ class App extends Component {
   }
 
   handleSelectItem(e) {
-    dietTracker.getNutrients(e.target.textContent);
+    const foodName = e.target.textContent
+    dietTracker.getNutrients(foodName);
     setTimeout(function() {
       this.setState({nutritionData: dietTracker.nutrientTracker})
       console.log(this.state.nutritionData)
     }.bind(this), 1000);
   }
 
+  saveDietData(e) {
+    if (Object.keys(dietTracker.nutrientTracker).length) {
+      console.log("yep");
+      $.ajax({
+        url: 'http://localhost:5000/users/',
+        method:'POST',
+        dataType:'text',
+        processData: 'false',
+        data: dietTracker.nutrientTracker
+      }).then(function(res) {
+        alert(res);
+      });
+    }
+    else return;
+  }
+
   render() {
     return (
       <div onKeyUp={this.handleKeyPress}>
-        <ExpressTest/>
         <SearchBar className="searchBar" handleSearch={this.handleSearch}/>
         <ResultsList searchResults={this.state.searchResults || []} handleSelectItem={this.handleSelectItem}/>
-        <SelectedItemsList className="selectedItemsList" nutritionData={this.state.nutritionData || []}
-        onDataChange={this.handleNutritionDataChange}/>
-        <NutritionTable className="table itemTable" nutritionData={this.state.nutritionData || []}/>
+        {(Object.keys(this.state.nutritionData).length)
+          ? <div>
+              <SelectedItemsList className="selectedItemsList" nutritionData={this.state.nutritionData || []}
+              onDataChange={this.handleNutritionDataChange}/>
+              <NutritionTable className="table itemTable" nutritionData={this.state.nutritionData || []}/>
+              <button onClick= {this.saveDietData}>Save</button>
+            </div>
+          : null
+        }
       </div>
     )
   };
 }
 
-class ExpressTest extends Component {
-  constructor(props) {
-    super(props);
-    this.state = { response: ''};
-  }
 
-  componentDidMount() {
-    this.callApi()
-      .then(res => this.setState({ response: res.express }))
-      .catch(err => console.log(err));
-  }
+//1. create Schema that matches filtered objects from Nutritionix
+//
 
-  callApi = async () => {
-    const response = await fetch('/api/hello');
-    const body = await response.json();
-
-    if (response.status !== 200) throw Error(body.message);
-
-    return body;
-  };
-
-  render() {
-    return (
-        <p className="App-intro">{this.state.response}</p>
-    );
-  }
-}
+// class ExpressTest extends Component {
+//   constructor(props) {
+//     super(props);
+//     this.state = { response: []};
+//   }
+//
+//   componentDidMount() {
+//     this.callApi()
+//       .then(res => this.setState({ response: res}))
+//       .catch(err => console.log(err));
+//   }
+//
+// //TODO: can this async call be done using jquery AJAX as well? Try it!
+//   callApi = async () => {
+//     console.log("there");
+//     const response = await fetch('http://localhost:5000/api/nutritionInfo');
+//     const body = await response.json();
+//
+//     if (response.status !== 200) throw Error(body.message);
+//
+//     return body;
+//   };
+//
+//   render() {
+//     return (
+//       <ul>
+//         {this.state.response.map((person) =>
+//           <li>{person.name}</li>
+//         )}
+//       </ul>
+//     );
+//   }
+// }
 
 class SearchBar extends Component {
   constructor(props) {
@@ -273,7 +306,10 @@ class NutritionTableFooter extends Component {
     const headers = this.props.headers;
     const foodItems = Object.keys(this.props.nutritionData);
     const nutritionData = this.props.nutritionData;
-    const footerData = {name: "Total"};
+    //only add Total footer if there are food items to display
+    const footerData = (this.props.headers[0]) ? {name: "Total"} : {};
+
+
 
     //loop through all headers
     headers.map(function(header) {

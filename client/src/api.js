@@ -5,7 +5,6 @@ const dietTracker = {};
 //modules in variables. If not, how can external programs access those variables?
 dietTracker.searchResults = [];
 dietTracker.nutrientTracker = [];
-dietTracker.test = "hello";
 
 //IDs and Keys
 dietTracker.Id = "3c51cd82"
@@ -77,6 +76,15 @@ dietTracker.nutrientCodes = [{code:203, nutrient: "protein"},
 //create object that stores all selected food items and their nutritional information.
 dietTracker.nutrientTracker = {};
 
+//NutritionInfo Object Structure
+//{food1: {name: name, amount: value, protein:value, fat: value, cals: value, carb: value},
+// food2: {name: name, amount: value, protein:value, fat: value, cals: value, carb: value}}
+//
+//
+//
+//
+//
+
 
 //Store/add nutrient info for a single food item to nutrientTracker object.
 //Requires 2 parameters (nutrientInfo (straight from Nutritionix API) and name of food item)
@@ -106,7 +114,7 @@ dietTracker.addNutrientInfo = function(nutrientInfo) {
     });
   });
 
-  console.log(dietTracker.nutrientTracker);
+  console.log(typeof dietTracker.nutrientTracker);
 
   //save into local storage. TODO: more storage to migrate to DB.
   localStorage.setItem("nutrientTracker", JSON.stringify(dietTracker.nutrientTracker));
