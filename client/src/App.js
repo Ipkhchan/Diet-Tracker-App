@@ -76,6 +76,7 @@ class App extends Component {
         break;
     }
     this.setState({nutritionData: nutritionData});
+    console.log(this.state.nutritionData);
   }
 
   handleKeyPress(e) {
@@ -233,6 +234,10 @@ class SelectedItemsList extends Component {
     this.handleChange = this.handleChange.bind(this);
   }
 
+  componentWillReceiveProps(nextProps) {
+    console.log("nextProps=",nextProps);
+  }
+
   handleChange(e) {
     this.props.onDataChange(e);
   }
@@ -245,9 +250,9 @@ class SelectedItemsList extends Component {
             <li key={"select" + foodItem} className = "foodItem flex">
               {nutritionData[foodItem].name}
               <div className = "flex edits" data-fooditem = {foodItem}  onChange = {this.handleChange}>
-                <input type="number" defaultValue="1" min="1" className="itemQuantity"></input>
+                <input type="number" value={nutritionData[foodItem].quantity} min="1" className="itemQuantity"></input>
                 <p>units or</p>
-                <input type="number" defaultValue={nutritionData[foodItem].amount} min="1" className="itemWeight"></input>
+                <input type="number" value={nutritionData[foodItem].amount} min="1" className="itemWeight"></input>
                 <p>grams</p>
                 <button type="button" className="removeItem" onClick = {this.handleChange}>X</button>
               </div>

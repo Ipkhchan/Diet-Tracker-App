@@ -3,5 +3,6 @@ module.exports = {
       "node": true,
       "es6": true
   },
-  "extends": "google"
+  "extends": "google",
+  "linebreak-style": ["error", "windows"]
 };
