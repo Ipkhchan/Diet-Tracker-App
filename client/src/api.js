@@ -61,8 +61,8 @@ dietTracker.getNutrients = function(itemName) {
 dietTracker.filterTrackedNutrients = function(nutrient) {
   if ([203, //protein
        204, //fat
-       208, //cal
-       209  //carb
+       208, //calorie
+       209  //carbohydrate
        ].indexOf(nutrient.attr_id) >= 0) {
     return true;
   }
@@ -73,8 +73,8 @@ dietTracker.filterTrackedNutrients = function(nutrient) {
 //in the table
 dietTracker.nutrientCodes = [{code:203, nutrient: "protein"},
                              {code:204, nutrient: "fat"},
-                             {code:208, nutrient: "cals"},
-                             {code:209, nutrient: "carb"}];
+                             {code:208, nutrient: "calorie"},
+                             {code:209, nutrient: "carbohydrate"}];
 
 //create object that stores all selected food items and their nutritional information.
 dietTracker.nutrientTracker = {};
@@ -118,49 +118,6 @@ dietTracker.addNutrientInfo = function(nutrientInfo) {
       }
     });
   });
-
-  console.log(typeof dietTracker.nutrientTracker);
-
-  //save into local storage. TODO: more storage to migrate to DB.
-  localStorage.setItem("nutrientTracker", JSON.stringify(dietTracker.nutrientTracker));
-  dietTracker.addItemTable(dietTracker.nutrientTracker[foodItem]);
 };
-
-//Using localStorage for now. TODO: Migrate to back-end later.
-dietTracker.storeItems = function() {
-  // localStorage.setItem("itemList", selectedItems.innerHTML);
-};
-
-//TODO: Migrate to back-end
-dietTracker.loadSelectedItems = function() {
-  // selectedItems.innerHTML = localStorage.getItem("itemList");
-  if (localStorage.getItem("nutrientTracker") != null) {
-    dietTracker.nutrientTracker = JSON.parse(localStorage.getItem("nutrientTracker"));
-    for (var foodItem in dietTracker.nutrientTracker) {
-      dietTracker.addItemTable(dietTracker.nutrientTracker[foodItem]);
-    };
-  };
-};
-
-// search.addEventListener("click", dietTracker.searchItem);
-// document.addEventListener("keyup", (e) => {if (e.keyCode == 13) {dietTracker.searchItem()}});
-// resultList.addEventListener("click", dietTracker.selectItem);
-// selectedItems.addEventListener("click", dietTracker.editSelectedItem);
-
-
-//
-// //TODO: add ability to re-arrange order of result list
-// var nutritionData = {
-//   food1: {name: "food1", servingSize: 100, protein: 102, carb: 103, fat: 104, cals: 105},
-//   food2: {name: "food2", servingSize: 200, protein: 202, carb: 203, fat: 204, cals: 205},
-//   food3: {name: "food3", servingSize: 300, protein: 302, carb: 303, fat: 304, cals: 305},
-// };
-//
-// for (const foodItem in nutritionData) {
-//   Object.defineProperty(nutritionData[foodItem], "defaultServingSize", {
-//     value: 100,
-//     enumerable: false
-//   });
-// };
 
 export default dietTracker;

@@ -87,6 +87,7 @@ module.exports.save_fooditem_data = function(req, res, next) {
 module.exports.get_fooditem_data = function(req, res, next) {
   userDailyDiet.find({}, {'_id': 0, '__v': 0}, function(err, foodItems) {
     if (err) console.log(err);
+    console.log(foodItems);
     res.append('Access-Control-Allow-Origin', ['*']);
     res.append('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
     res.append('Access-Control-Allow-Headers', 'Content-Type');

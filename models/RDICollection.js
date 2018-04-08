@@ -6,6 +6,7 @@ var rdiSchema = new Schema({
     age_min: Number,
     age_max: Number,
     sex: String,
+    calorie: Number,
     carbohydrate: Number,
     protein: Number,
     fat: Number,

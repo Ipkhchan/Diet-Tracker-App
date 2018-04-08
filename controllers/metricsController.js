@@ -1,5 +1,16 @@
 const rdiCollection = require('../models/RDICollection');
 
+module.exports.get_RDISet = function(req, res, next) {
+  rdiCollection.findOne(function(err, RDISet) {
+    if (err) {next(err);}
+    console.log(RDISet);
+    res.append('Access-Control-Allow-Origin', ['*']);
+    res.append('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+    res.append('Access-Control-Allow-Headers', 'Content-Type');
+    res.json(RDISet);
+  });
+};
+
 //TODO: Instead of deleting and recreating RDISets as an update sequence, try actually updating?
 //TODO: Try implementing indexing so searches are quicker.
 module.exports.save_RDISet = function(req, res, next) {

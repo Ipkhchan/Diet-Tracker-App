@@ -7,8 +7,8 @@ var UserDailyDietSchema = new Schema({
     amount: Number,
     protein: Number,
     fat: Number,
-    cals: Number,
-    carb: Number
+    calorie: Number,
+    carbohydrate: Number
 });
 
 module.exports = mongoose.model('UserDailyDiet', UserDailyDietSchema);

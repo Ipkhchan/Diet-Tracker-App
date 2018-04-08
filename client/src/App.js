@@ -49,7 +49,7 @@ class AdminPage extends Component {
     });
 
     $.ajax({
-      url: 'http://localhost:5000/admin/',
+      url: 'http://localhost:5000/metrics/',
       method:'POST',
       dataType:'text',
       processData: 'false',
@@ -212,7 +212,10 @@ class Track extends Component {
               <button onClick= {this.analyzeDiet}>Analyze My Diet!</button>
               <button onClick= {this.saveDietData}>Save</button>
             </div>
-          : null
+          : <div>
+              <button onClick= {this.analyzeDiet}>Analyze My Diet!</button>
+              <button onClick= {this.saveDietData}>Save</button>
+            </div>
         }
       </div>
     )
@@ -278,19 +281,26 @@ const SelectedItemsList = (props) => {
   )
 }
 
-const NutritionTable = (props) => {
-  const nutritionData = props.nutritionData;
-  for (const foodItem in props.nutritionData) {
-      var headers = Object.keys(props.nutritionData[foodItem]);
-      break;
+class NutritionTable extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {headers: ["name","amount", "carbohydrate", "fat", "protein", "calorie",]}
   }
-  return (
-    <table>
-      <NutritionTableHeaders className="itemTableHeaders"  headers={headers || []}/>
-      <NutritionTableRows className="itemTableRows" nutritionData={props.nutritionData} />
-      <NutritionTableFooter className="itemTableFooter" nutritionData = {props.nutritionData} headers={headers || []}/>
-    </table>
-  )
+
+  render() {
+    const nutritionData = this.props.nutritionData;
+    for (const foodItem in nutritionData) {
+        var headers = Object.keys(nutritionData[foodItem]);
+        break;
+    }
+    return (
+      <table>
+        <NutritionTableHeaders className="itemTableHeaders"  headers={this.state.headers}/>
+        <NutritionTableRows className="itemTableRows" nutritionData={nutritionData} headers={this.state.headers}/>
+        <MetricsFooter headers={this.state.headers}/>
+      </table>
+    )
+  }
 };
 
 const NutritionTableHeaders = (props) => {
@@ -310,18 +320,20 @@ const NutritionTableRows = (props) => {
   return (
     <tbody>
       {Object.keys(nutritionData).map((foodItem) =>
-        <NutritionTableRow key={nutritionData[foodItem].name} foodItem={nutritionData[foodItem]}/>
+        <NutritionTableRow key={nutritionData[foodItem].name} foodItem={nutritionData[foodItem]} headers={props.headers}/>
       )}
+      <NutritionTableTotals className="itemTableTotals" nutritionData = {nutritionData} headers={props.headers}/>
     </tbody>
   )
 };
 
 const NutritionTableRow = (props) => {
     const foodItem= props.foodItem;
+    const headers = props.headers;
     return (
       <tr>
-        {Object.keys(foodItem).map((header) =>
-          <td key={foodItem.name + header}>
+        {headers.map((header) =>
+          <td key={foodItem.name + "-" + header}>
             {typeof foodItem[header] == "number" ? Math.round(foodItem[header]*10)/10 : foodItem[header]}
           </td>
         )}
@@ -329,7 +341,14 @@ const NutritionTableRow = (props) => {
     )
 };
 
-const NutritionTableFooter = (props) => {
+// {Object.keys(foodItem).map((header) =>
+//   <td key={foodItem.name + header}>
+//     {typeof foodItem[header] == "number" ? Math.round(foodItem[header]*10)/10 : foodItem[header]}
+//   </td>
+// )}
+
+//TODO: 2 footer elements created here. Opportunity to use Higher Order Component?
+const NutritionTableTotals = (props) => {
   const headers = props.headers;
   const foodItems = Object.keys(props.nutritionData);
   const nutritionData = props.nutritionData;
@@ -355,7 +374,6 @@ const NutritionTableFooter = (props) => {
   });
 
   return (
-    <tfoot>
       <tr>
         {Object.keys(footerData).map((footer) =>
           <td key={footer + "-footer"}>
@@ -363,10 +381,45 @@ const NutritionTableFooter = (props) => {
           </td>
         )}
       </tr>
-    </tfoot>
   )
 
 };
+
+class MetricsFooter extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {metrics: {}};
+  }
+
+  componentDidMount() {
+    console.log("here");
+    $.ajax({
+      url: 'http://localhost:5000/metrics/',
+      method:'GET',
+      dataType:'JSON'
+    }).then((res) => {
+      console.log(res);
+      this.setState({metrics: res});
+    });
+  }
+
+
+
+  render() {
+    return (
+      <tfoot>
+        <tr>
+          <td>RDI</td>
+            {this.props.headers.map((header) =>
+              (header != "name")
+              ? <td key={header+"-rdi"}>{this.state.metrics[header] || ""}</td>
+              : null
+            )}
+        </tr>
+      </tfoot>
+    )
+  }
+}
 
 const NotFound = () => (
   <h1>404.. This page is not found!</h1>)
