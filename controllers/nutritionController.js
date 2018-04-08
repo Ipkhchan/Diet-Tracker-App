@@ -1,9 +1,11 @@
 // var foodCollection = require('../models/nutritionController');
+const { body,validationResult } = require('express-validator/check');
+const { sanitizeBody } = require('express-validator/filter');
 var userCollection = require('../models/userCollection')
 var userDailyDiet = require('../models/UserDailyDiet')
 
 module.exports.get_nutrition_data = function(req, res, next) {
-  // console.log("here");
+  console.log("here");
   // foodCollection.find()
   //   .exec(function (err, foodItemsList) {
   //     res.send(foodItemsList);

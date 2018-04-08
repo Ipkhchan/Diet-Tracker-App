@@ -1,9 +1,16 @@
 import React, { Component } from 'react';
+import {
+  BrowserRouter as Router,
+  Route,
+  Link,
+  Switch,
+  Redirect
+} from "react-router-dom";
 import './App.css';
 import $ from 'jquery';
 import dietTracker from './api.js'
 
-//App
+// App
 // -> SearchBar
 // -> ResultList
 // -> NutritionTable
@@ -17,7 +24,67 @@ import dietTracker from './api.js'
 //TODO: bug: if the first food item you select doesn't have all the nutrient categories (ex. fish doesn't show carbs)
 //that you want to track, it won't show the table header. Then if you add an item that does have that category, it will show the value,
 //but there is no table header for it.
-class App extends Component {
+const App = () => (
+  <Router>
+    <Switch>
+        <Route exact path="/" component={Track} />
+        <Route path="/admin" component={AdminPage} />
+        <Route path="*" component={NotFound} />
+    </Switch>
+  </Router>
+);
+
+class AdminPage extends Component {
+  constructor(props) {
+    super(props);
+    this.handleSubmit = this.handleSubmit.bind(this);
+  }
+
+  handleSubmit(e) {
+    e.preventDefault();
+    const formData = $('.rdiForm').serializeArray();
+    const postData = {};
+    formData.forEach(metric => {
+      postData[metric.name] = metric.value;
+    });
+
+    $.ajax({
+      url: 'http://localhost:5000/admin/',
+      method:'POST',
+      dataType:'text',
+      processData: 'false',
+      data: postData
+    }).then(function(res) {
+      alert(res);
+    });
+  }
+
+  render() {
+    const metrics = ["source", "age_min","age_max","sex", "carbohydrate",
+      "protein", "fat", "fiber", "calcium", "chromium", "copper",
+    "fluoride", "iodine", "iron", "magnesium", "manganese", "molybdenum",
+    "phosphorus", "selenium", "zinc", "potassium", "sodium", "chloride",
+    "vitamin-A", "vitamin-C", "vitamin-D", "vitamin-E", "vitamin-K", "thiamin",
+    "riboflavin", "niacin", "vitamin-B6", "folate", "vitamin-B12", "pantothenic-acid",
+    "biotin", "choline"]
+
+    return(
+      <form className="rdiForm" onSubmit={this.handleSubmit}>
+        {metrics.map((metric) =>
+          <div key={metric}>
+            <label htmlFor={metric}>{metric + ":"}</label>
+            <input type="text" name={metric} id={metric}/>
+          </div>
+        )}
+        <input type="submit" value="submit"/>
+      </form>
+    )
+  }
+};
+
+
+
+class Track extends Component {
   constructor(props) {
     super(props);
     this.handleNutritionDataChange = this.handleNutritionDataChange.bind(this);
@@ -25,6 +92,7 @@ class App extends Component {
     this.handleKeyPress = this.handleKeyPress.bind(this);
     this.handleSelectItem = this.handleSelectItem.bind(this);
     this.saveDietData = this.saveDietData.bind(this);
+    this.analyzeDiet = this.analyzeDiet.bind(this);
     this.state = {nutritionData: {}, searchResults: []};
   }
 
@@ -109,14 +177,11 @@ class App extends Component {
     dietTracker.getNutrients(foodName);
     setTimeout(function() {
       this.setState({nutritionData: dietTracker.nutrientTracker})
-      console.log(this.state.nutritionData)
     }.bind(this), 1000);
   }
 
   saveDietData(e) {
     if (Object.keys(dietTracker.nutrientTracker).length) {
-      console.log("yep");
-      console.log(dietTracker.nutrientTracker);
       $.ajax({
         url: 'http://localhost:5000/users/',
         method:'POST',
@@ -130,6 +195,10 @@ class App extends Component {
     else return;
   }
 
+  analyzeDiet() {
+    console.log("ok!");
+  }
+
   render() {
     return (
       <div onKeyUp={this.handleKeyPress}>
@@ -138,8 +207,9 @@ class App extends Component {
         {(Object.keys(this.state.nutritionData).length)
           ? <div>
               <SelectedItemsList className="selectedItemsList" nutritionData={this.state.nutritionData || []}
-              onDataChange={this.handleNutritionDataChange}/>
+              handleNutritionDataChange={this.handleNutritionDataChange}/>
               <NutritionTable className="table itemTable" nutritionData={this.state.nutritionData || []}/>
+              <button onClick= {this.analyzeDiet}>Analyze My Diet!</button>
               <button onClick= {this.saveDietData}>Save</button>
             </div>
           : null
@@ -148,44 +218,6 @@ class App extends Component {
     )
   };
 }
-
-
-//1. create Schema that matches filtered objects from Nutritionix
-//
-
-// class ExpressTest extends Component {
-//   constructor(props) {
-//     super(props);
-//     this.state = { response: []};
-//   }
-//
-//   componentDidMount() {
-//     this.callApi()
-//       .then(res => this.setState({ response: res}))
-//       .catch(err => console.log(err));
-//   }
-//
-// //TODO: can this async call be done using jquery AJAX as well? Try it!
-//   callApi = async () => {
-//     console.log("there");
-//     const response = await fetch('http://localhost:5000/api/nutritionInfo');
-//     const body = await response.json();
-//
-//     if (response.status !== 200) throw Error(body.message);
-//
-//     return body;
-//   };
-//
-//   render() {
-//     return (
-//       <ul>
-//         {this.state.response.map((person) =>
-//           <li>{person.name}</li>
-//         )}
-//       </ul>
-//     );
-//   }
-// }
 
 class SearchBar extends Component {
   constructor(props) {
@@ -215,102 +247,77 @@ class SearchBar extends Component {
   };
 }
 
-class ResultsList extends Component {
-  render() {
-    return (
-      <ul>
-        {this.props.searchResults.map((searchResult) =>
-          <li key={searchResult} onClick={this.props.handleSelectItem}>{searchResult}</li>
-        )}
-      </ul>
-    )
-  };
-}
+const ResultsList = (props) => {
+  return (
+    <ul>
+      {props.searchResults.map((searchResult) =>
+        <li key={searchResult} onClick={props.handleSelectItem}>{searchResult}</li>
+      )}
+    </ul>
+  )
+};
 
 //TODO: make it so that when you change itemQuanity, itemWeight also updates, and vice versa
-class SelectedItemsList extends Component {
-  constructor(props) {
-    super(props);
-    this.handleChange = this.handleChange.bind(this);
-  }
-
-  componentWillReceiveProps(nextProps) {
-    console.log("nextProps=",nextProps);
-  }
-
-  handleChange(e) {
-    this.props.onDataChange(e);
-  }
-
-  render() {
-      const nutritionData = this.props.nutritionData;
-      return (
-        <ul>
-          {Object.keys(nutritionData).map((foodItem) =>
-            <li key={"select" + foodItem} className = "foodItem flex">
-              {nutritionData[foodItem].name}
-              <div className = "flex edits" data-fooditem = {foodItem}  onChange = {this.handleChange}>
-                <input type="number" value={nutritionData[foodItem].quantity} min="1" className="itemQuantity"></input>
-                <p>units or</p>
-                <input type="number" value={nutritionData[foodItem].amount} min="1" className="itemWeight"></input>
-                <p>grams</p>
-                <button type="button" className="removeItem" onClick = {this.handleChange}>X</button>
-              </div>
-            </li>
-          )}
-        </ul>
-      )
-
-    };
+const SelectedItemsList = (props) => {
+  const nutritionData = props.nutritionData;
+  return (
+    <ul>
+      {Object.keys(nutritionData).map((foodItem) =>
+        <li key={"select" + foodItem} className = "foodItem flex">
+          {nutritionData[foodItem].name}
+          <div className = "flex edits" data-fooditem = {foodItem}  onChange = {props.handleNutritionDataChange}>
+            <input type="number" value={nutritionData[foodItem].quantity} min="1" className="itemQuantity"></input>
+            <p>units or</p>
+            <input type="number" value={nutritionData[foodItem].amount} min="1" className="itemWeight"></input>
+            <p>grams</p>
+            <button type="button" className="removeItem" onClick = {props.handleNutritionDataChange}>X</button>
+          </div>
+        </li>
+      )}
+    </ul>
+  )
 }
 
-class NutritionTable extends Component {
-  render() {
-    const nutritionData = this.props.nutritionData;
-    for (const foodItem in this.props.nutritionData) {
-        var headers = Object.keys(this.props.nutritionData[foodItem]);
-        break;
-    }
-    return (
-      <table>
-        <NutritionTableHeaders className="itemTableHeaders"  headers={headers || []}/>
-        <NutritionTableRows className="itemTableRows" nutritionData={this.props.nutritionData} />
-        <NutritionTableFooter className="itemTableFooter" nutritionData = {this.props.nutritionData} headers={headers || []}/>
-      </table>
-    )
-  };
-}
+const NutritionTable = (props) => {
+  const nutritionData = props.nutritionData;
+  for (const foodItem in props.nutritionData) {
+      var headers = Object.keys(props.nutritionData[foodItem]);
+      break;
+  }
+  return (
+    <table>
+      <NutritionTableHeaders className="itemTableHeaders"  headers={headers || []}/>
+      <NutritionTableRows className="itemTableRows" nutritionData={props.nutritionData} />
+      <NutritionTableFooter className="itemTableFooter" nutritionData = {props.nutritionData} headers={headers || []}/>
+    </table>
+  )
+};
 
-class NutritionTableHeaders extends Component {
-  render() {
-    return (
-      <thead>
-        <tr>
-          {this.props.headers.map((header) =>
-            <th key={header}>{header}</th>
-          )}
-        </tr>
-      </thead>
-    )
-  };
-}
-
-class NutritionTableRows extends Component {
-  render() {
-    const nutritionData = this.props.nutritionData;
-    return (
-      <tbody>
-        {Object.keys(nutritionData).map((foodItem) =>
-          <NutritionTableRow key={nutritionData[foodItem].name} foodItem={nutritionData[foodItem]}/>
+const NutritionTableHeaders = (props) => {
+  return (
+    <thead>
+      <tr>
+        {props.headers.map((header) =>
+          <th key={header}>{header}</th>
         )}
-      </tbody>
-    )
-  };
-}
+      </tr>
+    </thead>
+  )
+};
 
-class NutritionTableRow extends Component {
-  render() {
-    const foodItem= this.props.foodItem;
+const NutritionTableRows = (props) => {
+  const nutritionData = props.nutritionData;
+  return (
+    <tbody>
+      {Object.keys(nutritionData).map((foodItem) =>
+        <NutritionTableRow key={nutritionData[foodItem].name} foodItem={nutritionData[foodItem]}/>
+      )}
+    </tbody>
+  )
+};
+
+const NutritionTableRow = (props) => {
+    const foodItem= props.foodItem;
     return (
       <tr>
         {Object.keys(foodItem).map((header) =>
@@ -320,49 +327,48 @@ class NutritionTableRow extends Component {
         )}
       </tr>
     )
-  };
-}
+};
 
-class NutritionTableFooter extends Component {
-  render() {
-    const headers = this.props.headers;
-    const foodItems = Object.keys(this.props.nutritionData);
-    const nutritionData = this.props.nutritionData;
-    //only add Total footer if there are food items to display
-    const footerData = (this.props.headers[0]) ? {name: "Total"} : {};
+const NutritionTableFooter = (props) => {
+  const headers = props.headers;
+  const foodItems = Object.keys(props.nutritionData);
+  const nutritionData = props.nutritionData;
+  //only add Total footer if there are food items to display
+  const footerData = (props.headers[0]) ? {name: "Total"} : {};
 
+  //loop through all headers
+  headers.map(function(header) {
+    //for each header, if the attribute (ex. protein, carb) represents
+    //numerical data, loop through all the foodItems in the selected List
+    //and sum all values for that attribute
+    if (typeof nutritionData[foodItems[0]][header] == "number") {
+      footerData[header] = 0;
+      foodItems.map(function(foodItem) {
+        //ignore foodItems that don't have that attribute defined or are 0.
+        if(nutritionData[foodItem][header]) {
+          footerData[header] += nutritionData[foodItem][header];
+        }
+        return foodItem;
+      });
+    };
+    return header;
+  });
 
+  return (
+    <tfoot>
+      <tr>
+        {Object.keys(footerData).map((footer) =>
+          <td key={footer + "-footer"}>
+            {typeof footerData[footer] == "number" ? Math.round(footerData[footer]*10)/10 : footerData[footer]}
+          </td>
+        )}
+      </tr>
+    </tfoot>
+  )
 
-    //loop through all headers
-    headers.map(function(header) {
-      //for each header, if the attribute (ex. protein, carb) represents
-      //numerical data, loop through all the foodItems in the selected List
-      //and sum all values for that attribute
-      if (typeof nutritionData[foodItems[0]][header] == "number") {
-        footerData[header] = 0;
-        foodItems.map(function(foodItem) {
-          //ignore foodItems that don't have that attribute defined or are 0.
-          if(nutritionData[foodItem][header]) {
-            footerData[header] += nutritionData[foodItem][header];
-          }
-          return foodItem;
-        });
-      };
-      return header;
-    });
+};
 
-    return (
-      <tfoot>
-        <tr>
-          {Object.keys(footerData).map((footer) =>
-            <td key={footer + "-footer"}>
-              {typeof footerData[footer] == "number" ? Math.round(footerData[footer]*10)/10 : footerData[footer]}
-            </td>
-          )}
-        </tr>
-      </tfoot>
-    )
-  };
-}
+const NotFound = () => (
+  <h1>404.. This page is not found!</h1>)
 
 export default App;
