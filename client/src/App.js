@@ -24,15 +24,24 @@ import dietTracker from './api.js'
 //TODO: bug: if the first food item you select doesn't have all the nutrient categories (ex. fish doesn't show carbs)
 //that you want to track, it won't show the table header. Then if you add an item that does have that category, it will show the value,
 //but there is no table header for it.
-const App = () => (
-  <Router>
-    <Switch>
-        <Route exact path="/" component={Track} />
-        <Route path="/admin" component={AdminPage} />
-        <Route path="*" component={NotFound} />
-    </Switch>
-  </Router>
-);
+const App = () => {
+  const metrics = ["source", "age_min","age_max","sex", "calorie", "carbohydrate",
+    "protein", "fat", "fiber", "calcium", "chromium", "copper",
+  "fluoride", "iodine", "iron", "magnesium", "manganese", "molybdenum",
+  "phosphorus", "selenium", "zinc", "potassium", "sodium", "chloride",
+  "vitamin-A", "vitamin-C", "vitamin-D", "vitamin-E", "vitamin-K", "thiamin",
+  "riboflavin", "niacin", "vitamin-B6", "folate", "vitamin-B12", "pantothenic-acid",
+  "biotin", "choline"];
+  return (
+    <Router>
+      <Switch>
+          <Route exact path="/" render={()=><Track metrics={metrics}/>} />
+          <Route path="/admin" render={()=><AdminPage metrics={metrics}/>}/>
+          <Route path="*" component={NotFound} />
+      </Switch>
+    </Router>
+  )
+};
 
 class AdminPage extends Component {
   constructor(props) {
@@ -60,17 +69,11 @@ class AdminPage extends Component {
   }
 
   render() {
-    const metrics = ["source", "age_min","age_max","sex", "carbohydrate",
-      "protein", "fat", "fiber", "calcium", "chromium", "copper",
-    "fluoride", "iodine", "iron", "magnesium", "manganese", "molybdenum",
-    "phosphorus", "selenium", "zinc", "potassium", "sodium", "chloride",
-    "vitamin-A", "vitamin-C", "vitamin-D", "vitamin-E", "vitamin-K", "thiamin",
-    "riboflavin", "niacin", "vitamin-B6", "folate", "vitamin-B12", "pantothenic-acid",
-    "biotin", "choline"]
+    console.log(this.props.metrics);
 
     return(
       <form className="rdiForm" onSubmit={this.handleSubmit}>
-        {metrics.map((metric) =>
+        {this.props.metrics.map((metric) =>
           <div key={metric}>
             <label htmlFor={metric}>{metric + ":"}</label>
             <input type="text" name={metric} id={metric}/>
@@ -93,21 +96,22 @@ class Track extends Component {
     this.handleSelectItem = this.handleSelectItem.bind(this);
     this.saveDietData = this.saveDietData.bind(this);
     this.analyzeDiet = this.analyzeDiet.bind(this);
-    this.state = {nutritionData: {}, searchResults: []};
+    this.sumDietTotals = this.sumDietTotals.bind(this);
+    this.state = {nutritionData: {}, searchResults: [], dietTotals: {}};
   }
 
   componentDidMount() {
+    //TODO: Axios
     $.ajax({
       url: 'http://localhost:5000/users/',
       method:'GET',
       dataType:'JSON'
     }).then((res) => {
-      console.log(res);
       res.forEach(function(foodItem) {
         dietTracker.nutrientTracker[foodItem.name] = foodItem
       });
-      this.setState({nutritionData: dietTracker.nutrientTracker});
-      console.log(this.state.nutritionData);
+      const dietTotals = this.sumDietTotals(dietTracker.nutrientTracker);
+      this.setState({nutritionData: dietTracker.nutrientTracker, dietTotals: dietTotals});
     });
   }
 
@@ -143,7 +147,8 @@ class Track extends Component {
         }
         break;
     }
-    this.setState({nutritionData: nutritionData});
+    const dietTotals = this.sumDietTotals(nutritionData);
+    this.setState({nutritionData: nutritionData, dietTotals: dietTotals});
     console.log(this.state.nutritionData);
   }
 
@@ -176,8 +181,10 @@ class Track extends Component {
     const foodName = e.target.textContent
     dietTracker.getNutrients(foodName);
     setTimeout(function() {
-      this.setState({nutritionData: dietTracker.nutrientTracker})
+      const dietTotals = this.sumDietTotals(dietTracker.nutrientTracker);
+      this.setState({nutritionData: dietTracker.nutrientTracker, dietTotals: dietTotals})
     }.bind(this), 1000);
+
   }
 
   saveDietData(e) {
@@ -195,8 +202,29 @@ class Track extends Component {
     else return;
   }
 
+  sumDietTotals(nutritionData) {
+    const totals = {};
+    const foodItems = Object.keys(nutritionData);
+    this.props.metrics.forEach(metric => {
+      // for each header, if the attribute (ex. protein, carb) represents
+      //numerical data, loop through all the foodItems in the selected List
+      //and sum all values for that attribute
+      totals[metric] = 0;
+      foodItems.map(function(foodItem) {
+        //ignore foodItems that don't have that attribute defined or are 0.
+        if(nutritionData[foodItem][metric]) {
+          totals[metric] += nutritionData[foodItem][metric];
+        }
+        return foodItem;
+      });
+      return metric;
+    });
+    return totals;
+  }
+
   analyzeDiet() {
-    console.log("ok!");
+    //compare RDI values and total values
+    this.sumDietTotals();
   }
 
   render() {
@@ -208,7 +236,7 @@ class Track extends Component {
           ? <div>
               <SelectedItemsList className="selectedItemsList" nutritionData={this.state.nutritionData || []}
               handleNutritionDataChange={this.handleNutritionDataChange}/>
-              <NutritionTable className="table itemTable" nutritionData={this.state.nutritionData || []}/>
+              <NutritionTable className="table itemTable" nutritionData={this.state.nutritionData || []} dietTotals={this.state.dietTotals}/>
               <button onClick= {this.analyzeDiet}>Analyze My Diet!</button>
               <button onClick= {this.saveDietData}>Save</button>
             </div>
@@ -289,14 +317,14 @@ class NutritionTable extends Component {
 
   render() {
     const nutritionData = this.props.nutritionData;
-    for (const foodItem in nutritionData) {
-        var headers = Object.keys(nutritionData[foodItem]);
-        break;
-    }
+    // for (const foodItem in nutritionData) {
+    //     var headers = Object.keys(nutritionData[foodItem]);
+    //     break;
+    // }
     return (
       <table>
         <NutritionTableHeaders className="itemTableHeaders"  headers={this.state.headers}/>
-        <NutritionTableRows className="itemTableRows" nutritionData={nutritionData} headers={this.state.headers}/>
+        <NutritionTableRows className="itemTableRows" nutritionData={nutritionData} headers={this.state.headers} dietTotals = {this.props.dietTotals}/>
         <MetricsFooter headers={this.state.headers}/>
       </table>
     )
@@ -322,7 +350,7 @@ const NutritionTableRows = (props) => {
       {Object.keys(nutritionData).map((foodItem) =>
         <NutritionTableRow key={nutritionData[foodItem].name} foodItem={nutritionData[foodItem]} headers={props.headers}/>
       )}
-      <NutritionTableTotals className="itemTableTotals" nutritionData = {nutritionData} headers={props.headers}/>
+      <NutritionTableTotals className="itemTableTotals" nutritionData = {nutritionData} headers={props.headers} dietTotals = {props.dietTotals}/>
     </tbody>
   )
 };
@@ -341,37 +369,17 @@ const NutritionTableRow = (props) => {
     )
 };
 
-// {Object.keys(foodItem).map((header) =>
-//   <td key={foodItem.name + header}>
-//     {typeof foodItem[header] == "number" ? Math.round(foodItem[header]*10)/10 : foodItem[header]}
-//   </td>
-// )}
-
 //TODO: 2 footer elements created here. Opportunity to use Higher Order Component?
 const NutritionTableTotals = (props) => {
   const headers = props.headers;
-  const foodItems = Object.keys(props.nutritionData);
-  const nutritionData = props.nutritionData;
-  //only add Total footer if there are food items to display
-  const footerData = (props.headers[0]) ? {name: "Total"} : {};
+  const dietTotals = props.dietTotals;
+  let footerData = {};
 
-  //loop through all headers
-  headers.map(function(header) {
-    //for each header, if the attribute (ex. protein, carb) represents
-    //numerical data, loop through all the foodItems in the selected List
-    //and sum all values for that attribute
-    if (typeof nutritionData[foodItems[0]][header] == "number") {
-      footerData[header] = 0;
-      foodItems.map(function(foodItem) {
-        //ignore foodItems that don't have that attribute defined or are 0.
-        if(nutritionData[foodItem][header]) {
-          footerData[header] += nutritionData[foodItem][header];
-        }
-        return foodItem;
-      });
-    };
-    return header;
-  });
+  //filter out the ones you actually want to display
+  headers.forEach(header => {
+    footerData[header] = dietTotals[header];
+  })
+  footerData.name = "Total";
 
   return (
       <tr>
@@ -392,13 +400,11 @@ class MetricsFooter extends Component {
   }
 
   componentDidMount() {
-    console.log("here");
     $.ajax({
       url: 'http://localhost:5000/metrics/',
       method:'GET',
       dataType:'JSON'
     }).then((res) => {
-      console.log(res);
       this.setState({metrics: res});
     });
   }
