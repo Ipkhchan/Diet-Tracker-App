@@ -99,3 +99,7 @@ a {
 .rdiForm > * {
   display: block;
 }
+
+.block > * {
+  display: block;
+}

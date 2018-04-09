@@ -97,22 +97,32 @@ class Track extends Component {
     this.saveDietData = this.saveDietData.bind(this);
     this.analyzeDiet = this.analyzeDiet.bind(this);
     this.sumDietTotals = this.sumDietTotals.bind(this);
-    this.state = {nutritionData: {}, searchResults: [], dietTotals: {}};
+    this.state = {nutritionData: {}, searchResults: [], dietTotals: {}, metrics:{}, deficiencyList:[]};
   }
 
   componentDidMount() {
     //TODO: Axios
+    //TODO: can send multiple ajax calls in parallel?
     $.ajax({
       url: 'http://localhost:5000/users/',
       method:'GET',
       dataType:'JSON'
     }).then((res) => {
       res.forEach(function(foodItem) {
-        dietTracker.nutrientTracker[foodItem.name] = foodItem
+        dietTracker.nutrientTracker[foodItem.name] = foodItem;
+      })
+    }).then(() => {
+        $.ajax({
+          url: 'http://localhost:5000/metrics/',
+          method:'GET',
+          dataType:'JSON'
+        }).then((res) => {
+          this.setState({metrics: res});
+        }).then(() => {
+          const dietTotals = this.sumDietTotals(dietTracker.nutrientTracker);
+          this.setState({nutritionData: dietTracker.nutrientTracker, dietTotals: dietTotals});
+        })
       });
-      const dietTotals = this.sumDietTotals(dietTracker.nutrientTracker);
-      this.setState({nutritionData: dietTracker.nutrientTracker, dietTotals: dietTotals});
-    });
   }
 
   //this handles changing the nutrition values based on the food quantity that
@@ -206,25 +216,35 @@ class Track extends Component {
     const totals = {};
     const foodItems = Object.keys(nutritionData);
     this.props.metrics.forEach(metric => {
-      // for each header, if the attribute (ex. protein, carb) represents
-      //numerical data, loop through all the foodItems in the selected List
-      //and sum all values for that attribute
-      totals[metric] = 0;
-      foodItems.map(function(foodItem) {
-        //ignore foodItems that don't have that attribute defined or are 0.
-        if(nutritionData[foodItem][metric]) {
-          totals[metric] += nutritionData[foodItem][metric];
-        }
-        return foodItem;
-      });
-      return metric;
+      if(["age_min", "age_max", "sex", "source"].indexOf(metric) < 0) {
+        // for each header, if the attribute (ex. protein, carb) represents
+        //numerical data, loop through all the foodItems in the selected List
+        //and sum all values for that attribute
+        totals[metric] = 0;
+        foodItems.map(function(foodItem) {
+          //ignore foodItems that don't have that attribute defined or are 0.
+          if(nutritionData[foodItem][metric]) {
+            totals[metric] += nutritionData[foodItem][metric];
+          }
+          return foodItem;
+        });
+        return metric;
+      }
     });
     return totals;
   }
 
   analyzeDiet() {
     //compare RDI values and total values
-    this.sumDietTotals();
+    const dietTotals = this.sumDietTotals(this.state.nutritionData);
+    let deficiencyList = [];
+    for (let dietTotal in dietTotals) {
+      if (dietTotals[dietTotal] < this.state.metrics[dietTotal]) {
+        deficiencyList.push(dietTotal);
+      }
+    };
+    this.setState({deficiencyList: deficiencyList});
+
   }
 
   render() {
@@ -245,9 +265,21 @@ class Track extends Component {
               <button onClick= {this.saveDietData}>Save</button>
             </div>
         }
+        <DeficiencyList deficiencyList = {this.state.deficiencyList}/>
       </div>
     )
   };
+}
+
+const DeficiencyList = (props) => {
+  console.log(props.deficiencyList);
+  return (
+    <div>
+      {props.deficiencyList.map(deficiency =>
+        <p className= "block">{"You may be deficient in " + deficiency}</p>
+      )}
+    </div>
+  )
 }
 
 class SearchBar extends Component {
@@ -325,7 +357,7 @@ class NutritionTable extends Component {
       <table>
         <NutritionTableHeaders className="itemTableHeaders"  headers={this.state.headers}/>
         <NutritionTableRows className="itemTableRows" nutritionData={nutritionData} headers={this.state.headers} dietTotals = {this.props.dietTotals}/>
-        <MetricsFooter headers={this.state.headers}/>
+        <MetricsFooter headers={this.state.headers} dietTotals = {this.props.dietTotals}/>
       </table>
     )
   }
@@ -406,10 +438,16 @@ class MetricsFooter extends Component {
       dataType:'JSON'
     }).then((res) => {
       this.setState({metrics: res});
-    });
+    }).then(() => {
+      let deficiencyTracker = [];
+      const dietTotals = this.props.dietTotals;
+      for (let dietTotal in dietTotals) {
+        if (dietTotals[dietTotal] < this.state.metrics[dietTotal]) {
+          deficiencyTracker.push(dietTotal);
+        }
+      };
+    })
   }
-
-
 
   render() {
     return (
