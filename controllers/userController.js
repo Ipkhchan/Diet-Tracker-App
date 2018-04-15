@@ -1,4 +1,5 @@
 var userDailyDiet = require('../models/UserDailyDiet');
+var foodDataCollection = require('../models/foodDataCollection');
 var async = require('async')
 
 //TODO: implement Access-Control-Allow-Origin globally so you don't
@@ -94,3 +95,26 @@ module.exports.get_fooditem_data = function(req, res, next) {
     res.json(foodItems);
   });
 };
+
+module.exports.get_nutritiousfood_data = function(req, res, next) {
+  console.log(req.params.nutrient_name);
+  const nutrient = req.params.nutrient_name;
+  foodDataCollection.find({},{'_id': 0, 'name':1, [nutrient]: 1}).sort({nutrient:-1}).limit(5).exec(
+    function(err, foodItems) {
+      if (err) {return next(err);};
+      res.append('Access-Control-Allow-Origin', ['*']);
+      res.append('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+      res.append('Access-Control-Allow-Headers', 'Content-Type');
+      res.json(foodItems);
+
+    }
+  );
+  //
+  // foodDataCollection.find(function(err, foodItems) {
+  //   if (err) {return next(err);};
+  //   console.log(foodItems);
+  // });
+
+
+
+}

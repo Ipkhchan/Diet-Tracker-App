@@ -1,7 +1,7 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
-var UserDailyDietSchema = new Schema({
+var foodDataSchema = new Schema({
     name: String,
     quantity: Number,
     amount: Number,
@@ -41,5 +41,4 @@ var UserDailyDietSchema = new Schema({
     choline: Number
 });
 
-module.exports = mongoose.model('UserDailyDiet', UserDailyDietSchema);
-// module.exports.foodItemCollection = mongoose.model('FoodItem', UserDailyDietSchema);
+module.exports = mongoose.model('foodData', foodDataSchema);

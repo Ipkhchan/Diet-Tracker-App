@@ -8,4 +8,6 @@ router.get('/', userController.get_fooditem_data);
 
 router.post('/', userController.save_fooditem_data);
 
+router.get('/nutrients/:nutrient_name', userController.get_nutritiousfood_data);
+
 module.exports = router;

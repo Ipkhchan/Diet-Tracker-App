@@ -59,10 +59,8 @@ dietTracker.getNutrients = function(itemName) {
 //TODO: desired nutrients should be fed into to dietTracker. It should be external
 //to the module
 dietTracker.filterTrackedNutrients = function(nutrient) {
-  if ([203, //protein
-       204, //fat
-       208, //calorie
-       209  //carbohydrate
+  if ([203, 204, 208, 209, 301, 303, 304, 305, 306, 307, 309, 312, 313, 315, 317,
+        318, 321, 322, 323, 324, 325, 326, 401, 404, 405, 406, 410, 415, 417, 418, 421, 430
        ].indexOf(nutrient.attr_id) >= 0) {
     return true;
   }
@@ -74,7 +72,35 @@ dietTracker.filterTrackedNutrients = function(nutrient) {
 dietTracker.nutrientCodes = [{code:203, nutrient: "protein"},
                              {code:204, nutrient: "fat"},
                              {code:208, nutrient: "calorie"},
-                             {code:209, nutrient: "carbohydrate"}];
+                             {code:209, nutrient: "carbohydrate"},
+                            {code:301, nutrient: "calcium"},
+                            {code:303, nutrient: "iron"},
+                            {code:304, nutrient: "magnesium"},
+                            {code:305, nutrient: "phosphorus"},
+                            {code:306, nutrient: "potassium"},
+                            {code:307, nutrient: "sodium"},
+                            {code:309, nutrient: "zinc"},
+                            {code:312, nutrient: "copper"},
+                            {code:313, nutrient: "fluoride"},
+                            {code:315, nutrient: "manganese"},
+                            {code:317, nutrient: "selenium"},
+                            {code:318, nutrient: "vitamin-A"},
+                            {code:321, nutrient: "carotene-beta"},
+                            {code:322, nutrient: "carotene-alpha"},
+                            {code:323, nutrient: "vitamin-E"},
+                            {code:324, nutrient: "vitamin-D"},
+                            {code:325, nutrient: "vitamin-D2"},
+                            {code:326, nutrient: "vitamin-D3"},
+                            {code:401, nutrient: "vitamin-C"},
+                            {code:404, nutrient: "thiamin"},
+                            {code:405, nutrient: "riboflavin"},
+                            {code:406, nutrient: "niacin"},
+                            {code:410, nutrient: "pantothenic-acid"},
+                            {code:415, nutrient: "vitamin-B6"},
+                            {code:417, nutrient: "folate"},
+                            {code:418, nutrient: "vitamin-B12"},
+                            {code:421, nutrient: "choline"},
+                            {code:430, nutrient: "vitamin-K"}];
 
 //create object that stores all selected food items and their nutritional information.
 dietTracker.nutrientTracker = {};
@@ -91,7 +117,7 @@ dietTracker.nutrientTracker = {};
 
 //Store/add nutrient info for a single food item to nutrientTracker object.
 //Requires 2 parameters (nutrientInfo (straight from Nutritionix API) and name of food item)
-//TODO: the algorithm for filtering this array could probably be improved
+//TODO: the algorithm for filtering this array could probably be improved. Can do in 1 step
 dietTracker.addNutrientInfo = function(nutrientInfo) {
   nutrientInfo = nutrientInfo.foods[0];
   const foodItem = nutrientInfo.food_name;

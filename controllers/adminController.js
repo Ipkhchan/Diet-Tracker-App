@@ -1,4 +1,7 @@
 const rdiCollection = require('../models/RDICollection');
+const foodDataCollection = require('../models/foodDataCollection');
+// const UserDailyDietSchema = require('../models/userDailyDiet');
+// const foodItemCollection = UserDailyDietSchema.foodItemCollection;
 
 module.exports.get_RDISet = function(req, res, next) {
   rdiCollection.findOne(function(err, RDISet) {
@@ -58,3 +61,20 @@ module.exports.save_RDISet = function(req, res, next) {
     };
   });
 };
+
+module.exports.save_foodData = function(req, res, next) {
+  console.log("here");
+  const foodData = req.body.data;
+  console.log(foodData);
+  // console.log(foodData);
+  for(let foodItem of foodData) {
+    console.log(foodItem.name);
+    foodDataCollection.create(foodItem, function(err) {
+      if(err) {return next(err);}
+    })
+  };
+  res.append('Access-Control-Allow-Origin', ['*']);
+  res.append('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+  res.append('Access-Control-Allow-Headers', 'Content-Type');
+  res.send("done");
+}

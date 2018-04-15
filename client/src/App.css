@@ -103,3 +103,8 @@ a {
 .block > * {
   display: block;
 }
+
+.flex {
+  display: flex;
+  justify-content: space-between;
+}

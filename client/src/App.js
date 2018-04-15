@@ -21,6 +21,7 @@ import dietTracker from './api.js'
 
 //TODO: what to display when there is no nutritionData. What to do if input is 0. Prevent decimal values in table (render without actually changing the data value)
 //TODO: place app initializations in componentDidMount within App
+//TODO: split components into individual files and export/import.
 //TODO: bug: if the first food item you select doesn't have all the nutrient categories (ex. fish doesn't show carbs)
 //that you want to track, it won't show the table header. Then if you add an item that does have that category, it will show the value,
 //but there is no table header for it.
@@ -36,14 +37,15 @@ const App = () => {
     <Router>
       <Switch>
           <Route exact path="/" render={()=><Track metrics={metrics}/>} />
-          <Route path="/admin" render={()=><AdminPage metrics={metrics}/>}/>
+          <Route path="/admin/metrics" render={()=><AdminMetricsPage metrics={metrics}/>}/>
+          <Route path="/admin/foodData" render={()=><AdminFoodDataPage/>}/>
           <Route path="*" component={NotFound} />
       </Switch>
     </Router>
   )
 };
 
-class AdminPage extends Component {
+class AdminMetricsPage extends Component {
   constructor(props) {
     super(props);
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -58,7 +60,7 @@ class AdminPage extends Component {
     });
 
     $.ajax({
-      url: 'http://localhost:5000/metrics/',
+      url: 'http://localhost:5000/admin/metrics',
       method:'POST',
       dataType:'text',
       processData: 'false',
@@ -85,6 +87,51 @@ class AdminPage extends Component {
   }
 };
 
+class AdminFoodDataPage extends Component {
+  constructor(props) {
+    super(props);
+    this.handleRead = this.handleRead.bind(this);
+  }
+
+  handleRead(e) {
+    e.preventDefault();
+    const file = document.querySelector("#input").files[0];
+    let reader = new FileReader();
+    reader.onloadend = function() {
+      let results = JSON.parse(reader.result);
+      let partialResults = results.slice(0,10);
+      console.log("hello", results.length);
+      console.log(partialResults);
+      console.log(partialResults[0].carbohydrate);
+
+      // let partialResults= reader.result.slice(0,10);
+      // console.log(partialResults);
+      for (let i = 0; i < results.length -10; i+=10) {
+        $.ajax({
+          url: 'http://localhost:5000/admin/foodData',
+          method:'POST',
+          dataType:'JSON',
+          processData: 'false',
+          data: {data: results.slice(i, i+10)}
+        }).then(function(res) {
+          console.log(res);
+        });
+      };
+    };
+    reader.readAsText(file);
+
+
+  }
+
+  render() {
+    return (
+      <form>
+        <input type="file" id="input"></input>
+        <button onClick={this.handleRead}>Submit</button>
+      </form>
+    )
+  }
+}
 
 
 class Track extends Component {
@@ -97,7 +144,8 @@ class Track extends Component {
     this.saveDietData = this.saveDietData.bind(this);
     this.analyzeDiet = this.analyzeDiet.bind(this);
     this.sumDietTotals = this.sumDietTotals.bind(this);
-    this.state = {nutritionData: {}, searchResults: [], dietTotals: {}, metrics:{}, deficiencyList:[]};
+    this.handleNutritiousFoodSearch = this.handleNutritiousFoodSearch.bind(this);
+    this.state = {nutritionData: {}, searchResults: [], dietTotals: {}, metrics:{}, deficiencyList:{}};
   }
 
   componentDidMount() {
@@ -113,7 +161,7 @@ class Track extends Component {
       })
     }).then(() => {
         $.ajax({
-          url: 'http://localhost:5000/metrics/',
+          url: 'http://localhost:5000/admin/metrics/',
           method:'GET',
           dataType:'JSON'
         }).then((res) => {
@@ -199,6 +247,7 @@ class Track extends Component {
 
   saveDietData(e) {
     if (Object.keys(dietTracker.nutrientTracker).length) {
+      console.log("saving ", dietTracker.nutrientTracker);
       $.ajax({
         url: 'http://localhost:5000/users/',
         method:'POST',
@@ -237,13 +286,24 @@ class Track extends Component {
   analyzeDiet() {
     //compare RDI values and total values
     const dietTotals = this.sumDietTotals(this.state.nutritionData);
-    let deficiencyList = [];
+    let deficiencyList = {};
     for (let dietTotal in dietTotals) {
       if (dietTotals[dietTotal] < this.state.metrics[dietTotal]) {
-        deficiencyList.push(dietTotal);
+        deficiencyList[dietTotal] = {dietAmount: dietTotals[dietTotal], rdi: this.state.metrics[dietTotal]};
       }
     };
     this.setState({deficiencyList: deficiencyList});
+  }
+
+  handleNutritiousFoodSearch(e) {
+    console.log(e.target.className);
+    $.ajax({
+      url: 'http://localhost:5000/users/nutrients/' + e.target.className,
+      method:'GET',
+      dataType:'JSON'
+    }).then(function(res) {
+      console.log(res);
+    });
 
   }
 
@@ -251,6 +311,7 @@ class Track extends Component {
     return (
       <div onKeyUp={this.handleKeyPress}>
         <SearchBar className="searchBar" handleSearch={this.handleSearch}/>
+        <RDISetSelector/>
         <ResultsList searchResults={this.state.searchResults || []} handleSelectItem={this.handleSelectItem}/>
         {(Object.keys(this.state.nutritionData).length)
           ? <div>
@@ -265,23 +326,54 @@ class Track extends Component {
               <button onClick= {this.saveDietData}>Save</button>
             </div>
         }
-        <DeficiencyList deficiencyList = {this.state.deficiencyList}/>
+        {(Object.keys(this.state.deficiencyList).length)
+          ? <DeficiencyList deficiencyList = {this.state.deficiencyList} handleNutritiousFoodSearch={this.handleNutritiousFoodSearch}/>
+          : null
+        }
       </div>
     )
   };
 }
 
+class RDISetSelector extends Component {
+  render() {
+    return (
+      <form>
+       <p>Enter your gender and age below:</p>
+       <label htmlFor="sex">Gender :</label>
+       <select id="sex">
+        <option value="male">male</option>
+        <option value="female">female</option>
+       </select>
+       <label htmlFor="age">Age :</label>
+       <input type="number" name="age"/>
+       <input type="submit" value="enter"/>
+      </form>
+    )
+  }
+}
+
 const DeficiencyList = (props) => {
-  console.log(props.deficiencyList);
+  const deficiencyList = props.deficiencyList;
   return (
     <div>
-      {props.deficiencyList.map(deficiency =>
-        <p className= "block">{"You may be deficient in " + deficiency}</p>
+      {Object.keys(deficiencyList).map(deficiency =>
+        <div key={deficiency} className="flex">
+          <p className= "block">{"You may be deficient in " + deficiency}</p>
+          <div className="flex">
+            <div>
+              <p>{"your diet amount: " + Math.round(deficiencyList[deficiency].dietAmount*10)/10}</p>
+              <p>{"the RDI is: " + Math.round(deficiencyList[deficiency].rdi*10)/10}</p>
+            </div>
+            <button className= {deficiency} onClick={props.handleNutritiousFoodSearch}>+</button>
+          </div>
+        </div>
       )}
     </div>
   )
 }
 
+//TODO: implement NLP capabilities (ex. 1 slice of bacon)
 class SearchBar extends Component {
   constructor(props) {
     super(props);
@@ -433,7 +525,7 @@ class MetricsFooter extends Component {
 
   componentDidMount() {
     $.ajax({
-      url: 'http://localhost:5000/metrics/',
+      url: 'http://localhost:5000/admin/metrics/',
       method:'GET',
       dataType:'JSON'
     }).then((res) => {

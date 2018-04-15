@@ -4,11 +4,13 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var logger = require('morgan');
+// var MongoClient = require('mongodb').MongoClient;
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var apiRouter = require('./routes/api');
-var adminRouter = require('./routes/metrics');
+var adminRouter = require('./routes/admin');
+
 
 var app = express();
 
@@ -18,11 +20,25 @@ var dev_db_url = 'mongodb://localhost:27017/DietTrackApp'
 var mongoDB = dev_db_url;
 mongoose.connect(mongoDB);
 mongoose.Promise = global.Promise;
-var db = mongoose.connection;
-db.on('error', console.error.bind(console, 'MongoDB connection error:'));
-db.on("open", function(ref) {
-  console.log("Connected to mongo server.");
+// var db = mongoose.connection;
+mongoose.connection.on('error', console.error.bind(console, 'MongoDB connection error:'));
+mongoose.connection.on("open", function(ref) {
+  console.log("Mongoose connected to mongo server.");
 });
+
+// MongoClient.connect(dev_db_url);
+// db.collection("USDASR28").find().toArray(function(err, foodData) {
+//   if(err) {console.log(err);}
+//   console.log(foodData);
+// });
+// MongoClient.connect("mongodb://localhost:27017/exampleDb", function(err, db) {
+//   if(!err) {
+//     console.log("MongoClient connected to mongo server");
+//
+//   }
+// });
+
+
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -32,12 +48,16 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+app.use(bodyParser());
+// app.use(bodyParser.json({limit: '50mb'}));
+// app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/api', apiRouter);
-app.use('/metrics', adminRouter);
+app.use('/admin', adminRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
