@@ -6,7 +6,7 @@ import RDISetSelector from '../common/RDISetSelector'
 import ResultsList from '../common/ResultsList'
 import SelectedItemsList from '../common/SelectedItemsList'
 import NutritionTable from './NutritionTable'
-import DeficiencyList from '../common/DeficiencyList'
+import DeficiencyList from './DeficiencyList'
 
 class Tracker extends Component {
   constructor(props) {
@@ -19,7 +19,12 @@ class Tracker extends Component {
     this.analyzeDiet = this.analyzeDiet.bind(this);
     this.sumDietTotals = this.sumDietTotals.bind(this);
     this.handleNutritiousFoodSearch = this.handleNutritiousFoodSearch.bind(this);
-    this.state = {nutritionData: {}, searchResults: [], dietTotals: {}, metrics:{}, deficiencyList:{}};
+    this.state = {nutritionData: {},
+                  searchResults: [],
+                  dietTotals: {},
+                  metrics:{},
+                  deficiencyList:{},
+                  foodRecommendations:{}};
   }
 
   componentDidMount() {
@@ -166,19 +171,22 @@ class Tracker extends Component {
         deficiencyList[dietTotal] = {dietAmount: dietTotals[dietTotal], rdi: this.state.metrics[dietTotal]};
       }
     };
-    this.setState({deficiencyList: deficiencyList});
+    this.handleNutritiousFoodSearch(deficiencyList, );
   }
 
-  handleNutritiousFoodSearch(e) {
-    console.log(e.target.className);
+  handleNutritiousFoodSearch(deficiencyList) {
+    console.log(deficiencyList);
     $.ajax({
-      url: 'http://localhost:5000/users/nutrients/' + e.target.className,
-      method:'GET',
-      dataType:'JSON'
-    }).then(function(res) {
-      console.log(res);
+      url: 'http://localhost:5000/users/nutrients',
+      method:'POST',
+      dataType:'JSON',
+      processData: 'false',
+      data: deficiencyList
+    }).then((res) => {
+      // console.log(res);
+      this.setState({deficiencyList: deficiencyList, foodRecommendations: res});
+      console.log(this.state.foodRecommendations);
     });
-
   }
 
   render() {
@@ -201,7 +209,7 @@ class Tracker extends Component {
             </div>
         }
         {(Object.keys(this.state.deficiencyList).length)
-          ? <DeficiencyList deficiencyList = {this.state.deficiencyList} handleNutritiousFoodSearch={this.handleNutritiousFoodSearch}/>
+          ? <DeficiencyList deficiencyList = {this.state.deficiencyList} foodRecommendations = {this.state.foodRecommendations}/>
           : null
         }
       </div>

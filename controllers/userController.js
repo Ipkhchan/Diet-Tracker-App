@@ -97,24 +97,19 @@ module.exports.get_fooditem_data = function(req, res, next) {
 };
 
 module.exports.get_nutritiousfood_data = function(req, res, next) {
-  console.log(req.params.nutrient_name);
-  const nutrient = req.params.nutrient_name;
-  foodDataCollection.find({},{'_id': 0, 'name':1, [nutrient]: 1}).sort({nutrient:-1}).limit(5).exec(
-    function(err, foodItems) {
-      if (err) {return next(err);};
-      res.append('Access-Control-Allow-Origin', ['*']);
-      res.append('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
-      res.append('Access-Control-Allow-Headers', 'Content-Type');
-      res.json(foodItems);
+  let deficiencyList = req.body;
+  let nutritiousFoodSearch = {};
+  for (let deficiency in deficiencyList) {
+    nutritiousFoodSearch[deficiency] = function(callback) {
+      foodDataCollection.find({},{'_id': 0, 'name':1, [deficiency]: 1}).sort({[deficiency]:-1}).limit(5).exec(callback);
+    };
+  }
 
-    }
-  );
-  //
-  // foodDataCollection.find(function(err, foodItems) {
-  //   if (err) {return next(err);};
-  //   console.log(foodItems);
-  // });
-
-
+  async.parallel(nutritiousFoodSearch, function(err, nutritiousFoodList) {
+    res.append('Access-Control-Allow-Origin', ['*']);
+    res.append('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+    res.append('Access-Control-Allow-Headers', 'Content-Type');
+    res.json(nutritiousFoodList);
+  });
 
 }
