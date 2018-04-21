@@ -1,12 +1,37 @@
 import React, {Component} from 'react';
 import $ from 'jquery';
+// import FoodRecommendationsList from '../common/FoodRecommendationsList'
+import DeficiencyItem from './DeficiencyItem'
 
 class DeficiencyList extends Component {
   constructor(props) {
     super(props);
     // this.handleNutritiousFoodSearch = this.handleNutritiousFoodSearch.bind(this);
     // this.state = {nutritiousFoods: {}}
+    // this.toggleFoodList = this.toggleFoodList.bind(this);
+    // this.state = {recommendedFoodsDisplayStatus: {}}
   }
+
+  // componentDidMount()
+
+  // componentDidUpdate() {
+  //   const recommendedFoodsDisplayStatus = {};
+  //   for (let deficiency in this.props.deficiencyList) {
+  //     recommendedFoodsDisplayStatus[deficiency] = false;
+  //   }
+  //   this.setState({recommendedFoodsDisplayStatus: recommendedFoodsDisplayStatus});
+  // }
+  // //
+  // // trackFoodListDisplayStatus() {
+  // //
+  // // }
+  //
+  // toggleFoodList(deficiency) {
+  //   this.state.recommendedFoodsDisplayStatus[deficiency] = !this.state.recommendedFoodsDisplayStatus;
+  //   // this.forceUpdate();
+  // }
+
+
 
   // handleNutritiousFoodSearch(e) {
   //   console.log(e.target.className);
@@ -22,31 +47,19 @@ class DeficiencyList extends Component {
 
   render() {
     const deficiencyList = this.props.deficiencyList;
-    const foodRecommendations = this.props.foodRecommendations;
+    // const foodRecommendations = this.props.foodRecommendations;
     return (
       <div>
         {Object.keys(deficiencyList).map(deficiency =>
-          <div key={deficiency} className="flex">
-            <div>
-              <p className= "block">{"You may be deficient in " + deficiency}</p>
-              <div className="flex">
-                <div>
-                  <p>{"your diet amount: " + Math.round(deficiencyList[deficiency].dietAmount*10)/10}</p>
-                  <p>{"the RDI is: " + Math.round(deficiencyList[deficiency].rdi*10)/10}</p>
-                </div>
-                <button className= {deficiency} onClick={this.handleNutritiousFoodSearch}>+</button>
-              </div>
-            </div>
-            <div>
-              {foodRecommendations[deficiency].map(foodRecommendation =>
-                <p key={foodRecommendation.name}>{foodRecommendation.name}</p>
-              )}
-            </div>
-          </div>
+          <DeficiencyItem key={deficiency}
+                          deficiency={deficiency}
+                          deficiencyList = {deficiencyList}/>
+
         )}
       </div>
     )
   }
 }
+                          // foodRecommendations = {foodRecommendations[deficiency]}/>
 
 export default DeficiencyList

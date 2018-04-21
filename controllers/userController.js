@@ -96,20 +96,67 @@ module.exports.get_fooditem_data = function(req, res, next) {
   });
 };
 
-module.exports.get_nutritiousfood_data = function(req, res, next) {
-  let deficiencyList = req.body;
-  let nutritiousFoodSearch = {};
-  for (let deficiency in deficiencyList) {
-    nutritiousFoodSearch[deficiency] = function(callback) {
-      foodDataCollection.find({},{'_id': 0, 'name':1, [deficiency]: 1}).sort({[deficiency]:-1}).limit(5).exec(callback);
-    };
-  }
+//TODO: add indexes for each nutrient to speed up search. Current search takes a
+//couple seconds to complete.
+// module.exports.get_nutritiousfood_data = function(req, res, next) {
+//   let deficiencyList = req.body;
+//   let nutritiousFoodSearch = {};
+//   for (let deficiency in deficiencyList) {
+//     nutritiousFoodSearch[deficiency] = function(callback) {
+//       foodDataCollection.find({},{'_id': 0, 'name':1, [deficiency]: 1}).sort({[deficiency]:-1}).limit(5).exec(callback);
+//     };
+//   }
+//
+//   async.parallel(nutritiousFoodSearch, function(err, nutritiousFoodList) {
+//     res.append('Access-Control-Allow-Origin', ['*']);
+//     res.append('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+//     res.append('Access-Control-Allow-Headers', 'Content-Type');
+//     res.json(nutritiousFoodList);
+//   });
+//
+// }
 
-  async.parallel(nutritiousFoodSearch, function(err, nutritiousFoodList) {
-    res.append('Access-Control-Allow-Origin', ['*']);
-    res.append('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
-    res.append('Access-Control-Allow-Headers', 'Content-Type');
-    res.json(nutritiousFoodList);
-  });
+module.exports.get_nutritiousfood_data = function(req, res, next) {
+  const deficiency = req.params.deficiency;
+  console.log(deficiency);
+
+  // function sendList(err, list) {
+  //   console.log(list);
+  //   // res.append('Access-Control-Allow-Origin', ['*']);
+  //   // res.append('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+  //   // res.append('Access-Control-Allow-Headers', 'Content-Type');
+  //   // res.json(list);
+  // }
+
+  foodDataCollection.find({},{'_id': 0, 'name':1, [deficiency]: 1}).
+                     sort({[deficiency]:-1}).
+                     limit(20).
+                     exec(function(err,list) {
+                       if(err) {next(err);}
+                       res.append('Access-Control-Allow-Origin', ['*']);
+                       res.append('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+                       res.append('Access-Control-Allow-Headers', 'Content-Type');
+                       res.json(list);
+                     });
+
+// foodDataCollection.findOne(function(one) {
+//   console.log(one);
+// })
+
+
+  // let deficiencyList = req.params.deficiency
+  // let nutritiousFoodSearch = {};
+  // for (let deficiency in deficiencyList) {
+  //   nutritiousFoodSearch[deficiency] = function(callback) {
+  //     foodDataCollection.find({},{'_id': 0, 'name':1, [deficiency]: 1}).sort({[deficiency]:-1}).limit(5).exec(callback);
+  //   };
+  // }
+  //
+  // async.parallel(nutritiousFoodSearch, function(err, nutritiousFoodList) {
+  //   res.append('Access-Control-Allow-Origin', ['*']);
+  //   res.append('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+  //   res.append('Access-Control-Allow-Headers', 'Content-Type');
+  //   res.json(nutritiousFoodList);
+  // });
 
 }
