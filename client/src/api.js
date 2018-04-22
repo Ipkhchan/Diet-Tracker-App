@@ -59,8 +59,11 @@ dietTracker.getNutrients = function(itemName) {
 //TODO: desired nutrients should be fed into to dietTracker. It should be external
 //to the module
 dietTracker.filterTrackedNutrients = function(nutrient) {
-  if ([203, 204, 208, 209, 301, 303, 304, 305, 306, 307, 309, 312, 313, 315, 317,
-        318, 321, 322, 323, 324, 325, 326, 401, 404, 405, 406, 410, 415, 417, 418, 421, 430
+  if ([203, 204, 205, 208, ,291, 301, 303, 304, 305, 306, 307, 309, 312, 313, 315, 317,
+        318, 321, 322, 323, 324, 325, 326, 401, 404, 405, 406, 410, 415, 417, 418, 421, 430,
+        501, 502, 503, 504, 505, 506, 507, 508, 509, 510, 511, 512, 513, 514, 515, 516, 517,
+        518, 521, 601, 605, 606, 617, 621, 629, 630, 631, 645, 646, 671, 672, 675, 685, 851, 852,
+        853, 855
        ].indexOf(nutrient.attr_id) >= 0) {
     return true;
   }
@@ -71,8 +74,9 @@ dietTracker.filterTrackedNutrients = function(nutrient) {
 //in the table
 dietTracker.nutrientCodes = [{code:203, nutrient: "protein"},
                              {code:204, nutrient: "fat"},
+                             {code:205, nutrient: "carbohydrate"},
                              {code:208, nutrient: "calorie"},
-                             {code:209, nutrient: "carbohydrate"},
+                             {code:291, fiber: "fiber"},
                             {code:301, nutrient: "calcium"},
                             {code:303, nutrient: "iron"},
                             {code:304, nutrient: "magnesium"},
@@ -100,7 +104,44 @@ dietTracker.nutrientCodes = [{code:203, nutrient: "protein"},
                             {code:417, nutrient: "folate"},
                             {code:418, nutrient: "vitamin-B12"},
                             {code:421, nutrient: "choline"},
-                            {code:430, nutrient: "vitamin-K"}];
+                            {code:430, nutrient: "vitamin-K"},
+                            {code:501, nutrient: "tryptophan"},
+                            {code:502, nutrient: "threonine"},
+                            {code:503, nutrient: "isoleucine"},
+                            {code:504, nutrient: "leucine"},
+                            {code:505, nutrient: "lysine"},
+                            {code:506, nutrient: "methionine"},
+                            {code:507, nutrient: "cystine"},
+                            {code:508, nutrient: "phenylalanine"},
+                            {code:509, nutrient: "tyrosine"},
+                            {code:510, nutrient: "valine"},
+                            {code:511, nutrient: "arginine"},
+                            {code:512, nutrient: "histidine"},
+                            {code:513, nutrient: "alanine"},
+                            {code:514, nutrient: "aspartic-acid"},
+                            {code:515, nutrient: "glutamic-acid"},
+                            {code:516, nutrient: "glycine"},
+                            {code:517, nutrient: "proline"},
+                            {code:518, nutrient: "serine"},
+                            {code:521, nutrient: "hydroxyproline"},
+                            {code:601, nutrient: "cholesterol"},
+                            {code:621, nutrient: "omega3-DHA"},
+                            {code:629, nutrient: "omega3-EPA"},
+                            {code:631, nutrient: "omega3-DPA"},
+                            {code:851, nutrient: "omega3-ALA"},
+                            {code:852, nutrient: "omega3-ETE"},
+                            {code:672, nutrient: "omega6-eicosadienoic-acid"},
+                            {code:675, nutrient: "omega6-linoleic-acid"},
+                            {code:685, nutrient: "omega6-GLA"},
+                            {code:853, nutrient: "omega6-DGLA"},
+                            {code:617, nutrient: "omega9-oleic-acid"},
+                            {code:630, nutrient: "omega9-erucic-acid"},
+                            {code:671, nutrient: "omega9-nervonic-acid"},
+                            {code:605, nutrient: "fatty-acids-trans"},
+                            {code:606, nutrient: "fatty-acids-saturated"},
+                            {code:645, nutrient: "fatty-acids-monounsaturated"},
+                            {code:646, nutrient: "fatty-acids-polyunsaturated"}
+                          ];
 
 //create object that stores all selected food items and their nutritional information.
 dietTracker.nutrientTracker = {};

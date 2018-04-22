@@ -7,6 +7,7 @@ import ResultsList from '../common/ResultsList'
 import SelectedItemsList from '../common/SelectedItemsList'
 import NutritionTable from './NutritionTable'
 import DeficiencyList from './DeficiencyList'
+import MicroNutrientsTracker from './MicroNutrientsTracker'
 
 class Tracker extends Component {
   constructor(props) {
@@ -18,13 +19,13 @@ class Tracker extends Component {
     this.saveDietData = this.saveDietData.bind(this);
     this.analyzeDiet = this.analyzeDiet.bind(this);
     this.sumDietTotals = this.sumDietTotals.bind(this);
+    this.toggleDeficiencyList = this.toggleDeficiencyList.bind(this);
     // this.handleNutritiousFoodSearch = this.handleNutritiousFoodSearch.bind(this);
     this.state = {nutritionData: {},
                   searchResults: [],
                   dietTotals: {},
                   metrics:{},
-                  deficiencyList:{},
-                  // foodRecommendations:{}
+                  deficiencyListIsShowing:false
                 };
   }
 
@@ -49,6 +50,7 @@ class Tracker extends Component {
         }).then(() => {
           const dietTotals = this.sumDietTotals(dietTracker.nutrientTracker);
           this.setState({nutritionData: dietTracker.nutrientTracker, dietTotals: dietTotals});
+          console.log("dietTotals", this.state.dietTotals);
         })
       });
   }
@@ -85,9 +87,11 @@ class Tracker extends Component {
         }
         break;
     }
-    const dietTotals = this.sumDietTotals(nutritionData);
-    this.setState({nutritionData: nutritionData, dietTotals: dietTotals});
-    console.log(this.state.nutritionData);
+    const [dietTotals, deficiencyList]= this.analyzeDiet();
+    // const dietTotals = this.sumDietTotals(nutritionData);
+    this.setState({nutritionData: nutritionData,
+                   dietTotals: dietTotals,
+                   deficiencyList: deficiencyList});
   }
 
   handleKeyPress(e) {
@@ -144,16 +148,18 @@ class Tracker extends Component {
   sumDietTotals(nutritionData) {
     const totals = {};
     const foodItems = Object.keys(nutritionData);
+    const metrics =this.state.metrics;
+
     this.props.metrics.forEach(metric => {
       if(["age_min", "age_max", "sex", "source"].indexOf(metric) < 0) {
         // for each header, if the attribute (ex. protein, carb) represents
         //numerical data, loop through all the foodItems in the selected List
         //and sum all values for that attribute
-        totals[metric] = 0;
+        totals[metric] = {dietAmount: 0, rdi: metrics[metric]};
         foodItems.map(function(foodItem) {
           //ignore foodItems that don't have that attribute defined or are 0.
           if(nutritionData[foodItem][metric]) {
-            totals[metric] += nutritionData[foodItem][metric];
+            totals[metric].dietAmount += nutritionData[foodItem][metric];
           }
           return foodItem;
         });
@@ -172,8 +178,19 @@ class Tracker extends Component {
         deficiencyList[dietTotal] = {dietAmount: dietTotals[dietTotal], rdi: this.state.metrics[dietTotal]};
       }
     };
-    this.setState({deficiencyList: deficiencyList});
+    return [dietTotals,deficiencyList];
+    // this.setState({deficiencyList: deficiencyList});
     // this.handleNutritiousFoodSearch(deficiencyList);
+  }
+
+  toggleDeficiencyList() {
+    if (this.state.deficiencyListIsShowing) {
+      this.setState({deficiencyListIsShowing: false})
+    }
+    else {
+      this.setState({deficiencyListIsShowing: true})
+    }
+    console.log(this.state.deficiencyListIsShowing);
   }
 
   // handleNutritiousFoodSearch(deficiencyList) {
@@ -196,29 +213,41 @@ class Tracker extends Component {
       <div onKeyUp={this.handleKeyPress}>
         <SearchBar className="searchBar" handleSearch={this.handleSearch}/>
         <RDISetSelector/>
-        <ResultsList searchResults={this.state.searchResults || []} handleSelectItem={this.handleSelectItem}/>
+        <ResultsList searchResults={this.state.searchResults || []}
+                     handleSelectItem={this.handleSelectItem}
+        />
         {(Object.keys(this.state.nutritionData).length)
           ? <div>
-              <SelectedItemsList className="selectedItemsList" nutritionData={this.state.nutritionData || []}
-              handleNutritionDataChange={this.handleNutritionDataChange}/>
-              <NutritionTable className="table itemTable" nutritionData={this.state.nutritionData || []} dietTotals={this.state.dietTotals}/>
-              <button onClick= {this.analyzeDiet}>Analyze My Diet!</button>
+              <SelectedItemsList className="selectedItemsList"
+                                 nutritionData={this.state.nutritionData}
+                                 handleNutritionDataChange={this.handleNutritionDataChange}
+              />
+              <NutritionTable className="table itemTable" nutritionData={this.state.nutritionData}
+                                                          dietTotals={this.state.dietTotals}
+                                                          metrics={this.state.metrics}
+              />
+              <MicroNutrientsTracker nutritionData={this.state.nutritionData}
+                                    dietTotals={this.state.dietTotals}
+              />
+              <button onClick= {this.toggleDeficiencyList}>Analyze My Diet!</button>
               <button onClick= {this.saveDietData}>Save</button>
             </div>
           : <div>
-              <button onClick= {this.analyzeDiet}>Analyze My Diet!</button>
+              <button onClick= {this.toggleDeficiencyList}>Analyze My Diet!</button>
               <button onClick= {this.saveDietData}>Save</button>
             </div>
         }
-        {(Object.keys(this.state.deficiencyList).length)
-          ? <DeficiencyList deficiencyList = {this.state.deficiencyList}
-                            // foodRecommendations = {this.state.foodRecommendations}
-                            />
-          : null
-        }
+
       </div>
     )
   };
 }
+
+// {(this.state.deficiencyListIsShowing)
+//   ? <DeficiencyList dietTotals = {this.state.dietTotals}
+//                     // foodRecommendations = {this.state.foodRecommendations}
+//     />
+//   : null
+// }
 
 export default Tracker

@@ -50,7 +50,9 @@ class DeficiencyItem extends Component {
           </div>
         </div>
         {(listIsShowing)
-        ?<FoodRecommendationsList foodRecommendations= {foodRecommendations}/>
+        ?<FoodRecommendationsList foodRecommendations= {foodRecommendations}
+                                  deficiencyAmount= {deficiencyList[deficiency]}
+                                  deficiency = {deficiency}/>
         :null
         }
       </div>

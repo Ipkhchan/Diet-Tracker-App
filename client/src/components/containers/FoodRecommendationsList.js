@@ -21,11 +21,23 @@ class FoodRecommendationsList extends Component {
   render () {
     const foodRecommendations = this.props.foodRecommendations;
     const foodSubListIndexStart = this.state.foodSubListIndexStart;
+    const dietTotal = this.props.dietTotal;
+    const metric = this.props.metric;
+    const isDeficient = dietTotal.dietAmount/dietTotal.rdi < 1 ? true : false ;
+    const deficiency = this.props.deficiency;
     return (
       <div>
         {foodRecommendations.slice(foodSubListIndexStart,foodSubListIndexStart + 5).
                              map(foodRecommendation =>
-          <p key={foodRecommendation.name}>{foodRecommendation.name}</p>
+          <div key={foodRecommendation.name}>
+            <p>{foodRecommendation.name}</p>
+            <p>{foodRecommendation[metric] +" per 100g"}</p>
+            {(isDeficient)
+            ?<p>{"Take " + Math.round(100*(100* ((dietTotal.rdi-dietTotal.dietAmount)/foodRecommendation[metric])))/100 +
+                " grams to meet your RDI"}</p>
+            :null
+            }
+          </div>
         )}
         <button onClick = {this.handleListDisplay}>Prev</button>
         <button onClick = {this.handleListDisplay}>Next</button>
@@ -33,6 +45,9 @@ class FoodRecommendationsList extends Component {
     )
   }
 }
+
+// <p>{Math.round(100*(100* ((deficiencyAmount.rdi-deficiencyAmount.dietAmount)/foodRecommendation[deficiency])))/100 +
+//     " grams"}</p>
 
 
 export default FoodRecommendationsList

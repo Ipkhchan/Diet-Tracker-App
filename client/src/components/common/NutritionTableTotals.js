@@ -8,7 +8,7 @@ const NutritionTableTotals = (props) => {
 
   //filter out the ones you actually want to display
   headers.forEach(header => {
-    footerData[header] = dietTotals[header];
+    footerData[header] = dietTotals[header] || "";
   })
   footerData.name = "Total";
 
@@ -16,7 +16,9 @@ const NutritionTableTotals = (props) => {
       <tr>
         {Object.keys(footerData).map((footer) =>
           <td key={footer + "-footer"}>
-            {typeof footerData[footer] == "number" ? Math.round(footerData[footer]*10)/10 : footerData[footer]}
+            {typeof footerData[footer].dietAmount == "number"
+            ? Math.round(footerData[footer].dietAmount*10)/10
+            : footerData[footer]}
           </td>
         )}
       </tr>

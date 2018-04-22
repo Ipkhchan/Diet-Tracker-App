@@ -1,6 +1,6 @@
 import React from 'react';
 
-//TODO: make it so that when you change itemQuanity, itemWeight also updates, and vice versa
+//TODO: undo button to bring back "removed" item
 const SelectedItemsList = (props) => {
   const nutritionData = props.nutritionData;
   return (

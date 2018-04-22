@@ -4,50 +4,15 @@ import $ from 'jquery';
 import DeficiencyItem from './DeficiencyItem'
 
 class DeficiencyList extends Component {
-  constructor(props) {
-    super(props);
-    // this.handleNutritiousFoodSearch = this.handleNutritiousFoodSearch.bind(this);
-    // this.state = {nutritiousFoods: {}}
-    // this.toggleFoodList = this.toggleFoodList.bind(this);
-    // this.state = {recommendedFoodsDisplayStatus: {}}
-  }
-
-  // componentDidMount()
-
-  // componentDidUpdate() {
-  //   const recommendedFoodsDisplayStatus = {};
-  //   for (let deficiency in this.props.deficiencyList) {
-  //     recommendedFoodsDisplayStatus[deficiency] = false;
-  //   }
-  //   this.setState({recommendedFoodsDisplayStatus: recommendedFoodsDisplayStatus});
-  // }
-  // //
-  // // trackFoodListDisplayStatus() {
-  // //
-  // // }
-  //
-  // toggleFoodList(deficiency) {
-  //   this.state.recommendedFoodsDisplayStatus[deficiency] = !this.state.recommendedFoodsDisplayStatus;
-  //   // this.forceUpdate();
-  // }
-
-
-
-  // handleNutritiousFoodSearch(e) {
-  //   console.log(e.target.className);
-  //   $.ajax({
-  //     url: 'http://localhost:5000/users/nutrients/' + e.target.className,
-  //     method:'GET',
-  //     dataType:'JSON'
-  //   }).then(function(res) {
-  //     console.log(res);
-  //   });
-  //
-  // }
-
   render() {
-    const deficiencyList = this.props.deficiencyList;
-    // const foodRecommendations = this.props.foodRecommendations;
+    const dietTotals = this.props.dietTotals;
+    console.log("dietTotals", dietTotals);
+    const deficiencyList = {};
+    for (let metric in dietTotals) {
+      if (dietTotals[metric].dietAmount < dietTotals[metric].rdi) {
+         deficiencyList[metric] = dietTotals[metric];
+      }
+    }
     return (
       <div>
         {Object.keys(deficiencyList).map(deficiency =>
@@ -60,6 +25,5 @@ class DeficiencyList extends Component {
     )
   }
 }
-                          // foodRecommendations = {foodRecommendations[deficiency]}/>
 
 export default DeficiencyList
