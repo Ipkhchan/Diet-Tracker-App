@@ -7,6 +7,15 @@ class MetricsFooter extends Component {
     // this.state = {metrics: {}};
   }
 
+  componentWillUpdate() {
+    console.log(this.props.metrics);
+  }
+
+  componentDidUpdate() {
+    console.log(this.props.metrics)
+    console.log(this.props.metrics.calorie);
+  }
+
   // componentDidMount() {
   //   $.ajax({
   //     url: 'http://localhost:5000/admin/metrics/',

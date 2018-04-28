@@ -2,12 +2,13 @@ import React, { Component } from 'react';
 import $ from 'jquery';
 import dietTracker from '../../api.js'
 import SearchBar from './SearchBar'
-import RDISetSelector from '../common/RDISetSelector'
+import RDISetSelector from './RDISetSelector'
 import ResultsList from '../common/ResultsList'
 import SelectedItemsList from '../common/SelectedItemsList'
 import NutritionTable from './NutritionTable'
 import DeficiencyList from './DeficiencyList'
 import MicroNutrientsTracker from './MicroNutrientsTracker'
+import FattyAcidTracker from './FattyAcidTracker'
 
 class Tracker extends Component {
   constructor(props) {
@@ -19,16 +20,20 @@ class Tracker extends Component {
     this.saveDietData = this.saveDietData.bind(this);
     this.analyzeDiet = this.analyzeDiet.bind(this);
     this.sumDietTotals = this.sumDietTotals.bind(this);
-    this.toggleDeficiencyList = this.toggleDeficiencyList.bind(this);
+    this.getRDISet = this.getRDISet.bind(this);
+    // this.toggleDeficiencyList = this.toggleDeficiencyList.bind(this);
     // this.handleNutritiousFoodSearch = this.handleNutritiousFoodSearch.bind(this);
     this.state = {nutritionData: {},
                   searchResults: [],
                   dietTotals: {},
                   metrics:{},
-                  deficiencyListIsShowing:false
+                  // deficiencyListIsShowing:false
                 };
   }
 
+
+  //TODO: use generators to yield promise control to componentDidMount.
+  //reorganize code in componentDidMount so code is easy to follow here.
   componentDidMount() {
     //TODO: Axios
     //TODO: can send multiple ajax calls in parallel?
@@ -41,18 +46,12 @@ class Tracker extends Component {
         dietTracker.nutrientTracker[foodItem.name] = foodItem;
       })
     }).then(() => {
-        $.ajax({
-          url: 'http://localhost:5000/admin/metrics/',
-          method:'GET',
-          dataType:'JSON'
-        }).then((res) => {
-          this.setState({metrics: res});
-        }).then(() => {
-          const dietTotals = this.sumDietTotals(dietTracker.nutrientTracker);
-          this.setState({nutritionData: dietTracker.nutrientTracker, dietTotals: dietTotals});
-          console.log("dietTotals", this.state.dietTotals);
-        })
-      });
+      this.getRDISet();
+    });
+    //getFoodData  (p)
+    //get_RDISet (p)
+    //sumDietTotals (need dietTracker from getFoodData call, need metrics from get_RDISet)
+    //
   }
 
   //this handles changing the nutrition values based on the food quantity that
@@ -163,7 +162,6 @@ class Tracker extends Component {
           }
           return foodItem;
         });
-        return metric;
       }
     });
     return totals;
@@ -183,16 +181,6 @@ class Tracker extends Component {
     // this.handleNutritiousFoodSearch(deficiencyList);
   }
 
-  toggleDeficiencyList() {
-    if (this.state.deficiencyListIsShowing) {
-      this.setState({deficiencyListIsShowing: false})
-    }
-    else {
-      this.setState({deficiencyListIsShowing: true})
-    }
-    console.log(this.state.deficiencyListIsShowing);
-  }
-
   // handleNutritiousFoodSearch(deficiencyList) {
   //   console.log(deficiencyList);
   //   $.ajax({
@@ -208,11 +196,39 @@ class Tracker extends Component {
   //   });
   // }
 
+ //TODO: package ajax call into 1 function since getRDISet and ComponentDidMount both
+ //use this ajax call
+  getRDISet(e) {
+    let sex = {value: "default"};
+    let age = {value: "default"};
+
+    if(e) {
+      e.preventDefault();
+      [sex, age] = $('.userRDIForm').serializeArray();
+      console.log(sex, age);
+    }
+
+    console.log("here");
+
+    $.ajax({
+      url: 'http://localhost:5000/admin/metrics/' + sex.value +'/' + age.value,
+      method:'GET',
+      dataType:'JSON'
+    }).then((res) => {
+      console.log(res);
+      this.setState({metrics: res});
+    }).then(() => {
+      const dietTotals = this.sumDietTotals(dietTracker.nutrientTracker);
+      this.setState({nutritionData: dietTracker.nutrientTracker, dietTotals: dietTotals});
+      console.log("dietTotals", this.state.dietTotals);
+    })
+  }
+
   render() {
     return (
       <div onKeyUp={this.handleKeyPress}>
         <SearchBar className="searchBar" handleSearch={this.handleSearch}/>
-        <RDISetSelector/>
+        <RDISetSelector getRDISet={this.getRDISet}/>
         <ResultsList searchResults={this.state.searchResults || []}
                      handleSelectItem={this.handleSelectItem}
         />
@@ -222,20 +238,20 @@ class Tracker extends Component {
                                  nutritionData={this.state.nutritionData}
                                  handleNutritionDataChange={this.handleNutritionDataChange}
               />
+              <button onClick= {this.saveDietData}
+                      style= {{float: "right"}}>
+                Save
+              </button>
               <NutritionTable className="table itemTable" nutritionData={this.state.nutritionData}
                                                           dietTotals={this.state.dietTotals}
                                                           metrics={this.state.metrics}
               />
+              <FattyAcidTracker nutritionData={this.state.nutritionData}/>
               <MicroNutrientsTracker nutritionData={this.state.nutritionData}
                                     dietTotals={this.state.dietTotals}
               />
-              <button onClick= {this.toggleDeficiencyList}>Analyze My Diet!</button>
-              <button onClick= {this.saveDietData}>Save</button>
             </div>
-          : <div>
-              <button onClick= {this.toggleDeficiencyList}>Analyze My Diet!</button>
-              <button onClick= {this.saveDietData}>Save</button>
-            </div>
+          : null
         }
 
       </div>
