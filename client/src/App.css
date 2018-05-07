@@ -104,7 +104,58 @@ a {
   display: block;
 }
 
-.flex {
+.flex-space-between {
   display: flex;
   justify-content: space-between;
+}
+
+.flex {
+  display: flex;
+}
+
+.row-0 {
+    margin: 0;
+    background-color: #222222;
+    position: relative;
+    justify-content: flex-end;
+}
+
+.row-0 .topnav{
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.row-0 li {
+    display: flex;
+    align-items: center;
+    height: 35px;
+}
+
+.row-0 a {
+    color: #ffffff;
+    font-size: 11px;
+    margin: 0 1vw;
+}
+
+.row-0 a:hover {
+    color: var(--accentColor);
+}
+
+.row-0 .menuBar {
+    font-size: 15px;
+    display: none;
+}
+
+.row-0 input {
+    /* width: 25vw; */
+    min-width: 100px;
+    max-width: 200px;
+    background-color: #333333;
+    color: #999999;
+    font-size: 12px;
+    font-weight: bold;
+    border: none;
+    padding-left: 10px;
+
 }

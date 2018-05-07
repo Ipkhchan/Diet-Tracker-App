@@ -38,7 +38,7 @@ class FattyAcidTracker extends Component {
 
     return (
       <div>
-        <div className = "flex">
+        <div className = "flex-space-between">
           <p>FATTY ACID RATIO</p>
           <button onClick= {this.toggleDisplay}>
             {(listIsShowing) ? "-" : "+"}

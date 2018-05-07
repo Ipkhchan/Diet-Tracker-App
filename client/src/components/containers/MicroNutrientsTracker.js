@@ -23,7 +23,7 @@ class MicroNutrientsTracker extends Component {
 
     return (
       <div>
-        <div className= "flex">
+        <div className= "flex-space-between">
           <p>MICRONUTRIENTS</p>
           <button onClick= {this.toggleMicronutrientDisplay}>
             {(listIsShowing) ? "-" : "+"}

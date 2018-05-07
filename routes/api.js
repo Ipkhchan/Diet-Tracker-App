@@ -3,7 +3,7 @@ var router = express.Router();
 
 var nutritionController = require('../controllers/nutritionController');
 
-console.log(nutritionController.data);
+// console.log(nutritionController.data);
 
 router.get('/nutritionInfo', nutritionController.get_nutrition_data);
 // router.get('/nutritionInfo', function(req, res, next) {

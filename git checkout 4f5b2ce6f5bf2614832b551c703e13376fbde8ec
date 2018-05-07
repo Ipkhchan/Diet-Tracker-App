@@ -1,0 +1,89 @@
+[33mcommit 4f5b2ce6f5bf2614832b551c703e13376fbde8ec[m[33m ([m[1;36mHEAD -> [m[1;32mmaster[m[33m, [m[1;31morigin/master[m[33m)[m
+Author: Ivan <ivanpkhchan@gmail.com>
+Date:   Sat Apr 28 10:23:10 2018 -0400
+
+    added ability to choose rdi based on age and gender. MVP
+
+[33mcommit eb1c4ac74c196085a4091e647de2567d49ce8b20[m
+Author: Ivan <ivanpkhchan@gmail.com>
+Date:   Sun Apr 22 19:02:34 2018 -0400
+
+    Added metric tracking bars and live analysis
+
+[33mcommit 1772c9f884ba272e412c1026dcecf71fdbc14d81[m
+Author: Ivan <ivanpkhchan@gmail.com>
+Date:   Fri Apr 20 22:38:58 2018 -0400
+
+    Added pagination for food recommendation lists
+
+[33mcommit 3dfa06dfe6a33c47203835f0fa266e2e3e5818c5[m
+Author: Ivan <ivanpkhchan@gmail.com>
+Date:   Sun Apr 15 22:15:26 2018 -0400
+
+    Added food recommendations display
+
+[33mcommit 5f8b098296adf038336b78fb0469a15d859e467b[m
+Author: Ivan <ivanpkhchan@gmail.com>
+Date:   Sun Apr 15 15:57:52 2018 -0400
+
+    Reorganized React Components
+
+[33mcommit adb9d6b854957c20cff694ee638efc37a26c5eda[m
+Author: Ivan <ivanpkhchan@gmail.com>
+Date:   Sat Apr 14 23:35:40 2018 -0400
+
+    Added ablitity to recommend food Items
+
+[33mcommit d01d6237a6c0331fdb42accd89859a4e8e85eb65[m
+Author: Ivan <ivanpkhchan@gmail.com>
+Date:   Sun Apr 8 21:32:06 2018 -0400
+
+    added ability to analyze diet and show deficiencies
+
+[33mcommit 6781736cdcf4174d7e01e024c599f9820f6f241d[m
+Author: Ivan <ivanpkhchan@gmail.com>
+Date:   Sun Apr 8 20:30:29 2018 -0400
+
+    refactored Summing to Diet Totals to a higher level source of truth
+
+[33mcommit 10592e627d562c98a8695565ca659ebef23ccbbd[m
+Author: Ivan <ivanpkhchan@gmail.com>
+Date:   Sun Apr 8 15:06:03 2018 -0400
+
+    refactored nutrition table
+
+[33mcommit c2443699a8d3475c1a06cebc1b280f1059f04f03[m
+Author: Ivan <ivanpkhchan@gmail.com>
+Date:   Sat Apr 7 23:31:15 2018 -0400
+
+    added Admin Page
+
+[33mcommit 16cc549a1af1f70365ef43a35f9639acc79b080f[m[33m ([m[1;32mReactRefactor[m[33m)[m
+Author: Ivan <ivanpkhchan@gmail.com>
+Date:   Sun Apr 1 22:11:35 2018 -0400
+
+    added ability to update and delete items from DB
+
+[33mcommit a437ea20cce0a28952e6be6c1b6f2556a8f56300[m
+Author: Ivan <ivanpkhchan@gmail.com>
+Date:   Sun Apr 1 11:33:50 2018 -0400
+
+    changed Schema to include quantity rather than defaultserving size
+
+[33mcommit 36ccc71c770ce9cec20d4b0fa107205580caa314[m
+Author: Ivan <ivanpkhchan@gmail.com>
+Date:   Sat Mar 31 22:23:55 2018 -0400
+
+    Added Ability to Save Diets to DB
+
+[33mcommit d1af92d51c9f24c3a58156bad9fbeac378d26ea5[m
+Author: Ivan <ivanpkhchan@gmail.com>
+Date:   Fri Mar 30 15:12:58 2018 -0400
+
+    Uploading Existing App to Git
+
+[33mcommit 92d6a2e34ac1505ffeb1428f23ebce759ff83b08[m
+Author: Ivan <ivanpkhchan@gmail.com>
+Date:   Fri Mar 30 15:10:55 2018 -0400
+
+    first commit

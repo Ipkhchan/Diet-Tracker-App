@@ -21,6 +21,7 @@ class Tracker extends Component {
     this.analyzeDiet = this.analyzeDiet.bind(this);
     this.sumDietTotals = this.sumDietTotals.bind(this);
     this.getRDISet = this.getRDISet.bind(this);
+    this.test = this.test.bind(this);
     // this.toggleDeficiencyList = this.toggleDeficiencyList.bind(this);
     // this.handleNutritiousFoodSearch = this.handleNutritiousFoodSearch.bind(this);
     this.state = {nutritionData: {},
@@ -31,17 +32,25 @@ class Tracker extends Component {
                 };
   }
 
+  //TODO: micronutrient units some don't match up. might have to adjust schema to include units
+
+
 
   //TODO: use generators to yield promise control to componentDidMount.
   //reorganize code in componentDidMount so code is easy to follow here.
   componentDidMount() {
     //TODO: Axios
     //TODO: can send multiple ajax calls in parallel?
+    console.log("token", localStorage.getItem('token'));
     $.ajax({
       url: 'http://localhost:5000/users/',
+      headers: {
+        "Authorization": `bearer ${localStorage.getItem('token')}`,
+      },
       method:'GET',
       dataType:'JSON'
     }).then((res) => {
+      console.log(res.headers);
       res.forEach(function(foodItem) {
         dietTracker.nutrientTracker[foodItem.name] = foodItem;
       })
@@ -50,8 +59,10 @@ class Tracker extends Component {
     });
     //getFoodData  (p)
     //get_RDISet (p)
+    //after (p) set state for nutritionData and RDISet, or at least need to pass both
+    //to sumDietTotals
     //sumDietTotals (need dietTracker from getFoodData call, need metrics from get_RDISet)
-    //
+    //set state for nutritionData, rdiset, and dietTotals, if haven't done yet.
   }
 
   //this handles changing the nutrition values based on the food quantity that
@@ -133,6 +144,7 @@ class Tracker extends Component {
       console.log("saving ", dietTracker.nutrientTracker);
       $.ajax({
         url: 'http://localhost:5000/users/',
+        headers: {'Authorization': `bearer ${localStorage.getItem('token')}`},
         method:'POST',
         dataType:'text',
         processData: 'false',
@@ -212,6 +224,7 @@ class Tracker extends Component {
 
     $.ajax({
       url: 'http://localhost:5000/admin/metrics/' + sex.value +'/' + age.value,
+      headers: {'Authorization': `bearer ${localStorage.getItem('token')}`},
       method:'GET',
       dataType:'JSON'
     }).then((res) => {
@@ -224,7 +237,19 @@ class Tracker extends Component {
     })
   }
 
+  test() {
+    $.ajax({
+      url: 'http://localhost:5000/admin/test',
+      headers: {'Authorization': `bearer ${localStorage.getItem('token')}`},
+      method:'GET',
+      dataType:'JSON'
+    }).then((res) => {
+      console.log(res);
+    });
+  }
+
   render() {
+    console.log("cookie", document.cookie);
     return (
       <div onKeyUp={this.handleKeyPress}>
         <SearchBar className="searchBar" handleSearch={this.handleSearch}/>
@@ -238,6 +263,9 @@ class Tracker extends Component {
                                  nutritionData={this.state.nutritionData}
                                  handleNutritionDataChange={this.handleNutritionDataChange}
               />
+              <button onClick= {this.test}>
+                Test
+              </button>
               <button onClick= {this.saveDietData}
                       style= {{float: "right"}}>
                 Save

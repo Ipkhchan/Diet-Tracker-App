@@ -64,7 +64,7 @@ class MicroNutrientTracker extends Component {
 
     return (
       <div>
-        <div className = "flex">
+        <div className = "flex-space-between">
           <p>{dietTotal} {' '}
            ({Math.round(dietTotals[dietTotal].dietAmount)}/{Math.round(dietTotals[dietTotal].rdi)}) {' '}
            {(isDeficient) ? String.fromCharCode("0x2718") : String.fromCharCode("0x2714")}

@@ -6,11 +6,12 @@ var async = require('async')
 //have to type it out every time
 //TODO: check if food item already exists in database
 module.exports.save_fooditem_data = function(req, res, next) {
+  console.log("req.user//userController", req.user);
+  console.log("req.cookies//userController", req.cookies);
+  console.log("req.session//userController", req.session);
   const foodItems = req.body;
   const sentFoodNames = Object.keys(req.body);
   const deletedFoodNames = [];
-  console.log(req.body);
-  console.log("sentFoodNames", sentFoodNames);
   let existingFoodNames = [];
     //TODO: understand how errors work. does return next(err) skip to the next
     //middleware without running the rest of the code? I'm concerned that
@@ -57,7 +58,6 @@ module.exports.save_fooditem_data = function(req, res, next) {
                  };
               })
           } else {
-            console.log(foodItem);
             userDailyDiet.create(foodItems[foodItem], function (err) {
                if (err) {return next(err);}
             });
@@ -67,7 +67,6 @@ module.exports.save_fooditem_data = function(req, res, next) {
       },
       //ASYNC function 2: delete removed items
       function(callback) {
-        console.log("deletedFoodItems=", deletedFoodNames);
         deletedFoodNames.forEach((deletedFoodName) =>
           userDailyDiet.findOneAndRemove({name: deletedFoodName}, function(err) {
             if(err) {return next(err);}
@@ -77,21 +76,23 @@ module.exports.save_fooditem_data = function(req, res, next) {
       }
     ], function(err) {
       if (err) {return next(err);}
-      res.append('Access-Control-Allow-Origin', ['*']);
-      res.append('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
-      res.append('Access-Control-Allow-Headers', 'Content-Type');
-      res.send("Saved!")
+      // console.log("headers");
+      // res.append('Access-Control-Allow-Origin', ['*']);
+      // res.append('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+      // res.append('Access-Control-Allow-Headers', 'Content-Type');
+      res.send("Saved!");
      });
    });
 };
 
 module.exports.get_fooditem_data = function(req, res, next) {
+  console.log("getfoodItemData");
   userDailyDiet.find({}, {'_id': 0, '__v': 0}, function(err, foodItems) {
-    if (err) console.log(err);
-    console.log(foodItems);
-    res.append('Access-Control-Allow-Origin', ['*']);
-    res.append('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
-    res.append('Access-Control-Allow-Headers', 'Content-Type');
+    if (err) {next(err);}
+    // console.log(foodItems);
+    // res.append('Access-Control-Allow-Origin', ['*']);
+    // res.append('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+    // res.append('Access-Control-Allow-Headers', 'Content-Type');
     res.json(foodItems);
   });
 };
@@ -118,7 +119,7 @@ module.exports.get_fooditem_data = function(req, res, next) {
 
 module.exports.get_nutritiousfood_data = function(req, res, next) {
   const deficiency = req.params.deficiency;
-  console.log(deficiency);
+  // console.log(deficiency);
 
   // function sendList(err, list) {
   //   console.log(list);
@@ -133,9 +134,9 @@ module.exports.get_nutritiousfood_data = function(req, res, next) {
                      limit(20).
                      exec(function(err,list) {
                        if(err) {next(err);}
-                       res.append('Access-Control-Allow-Origin', ['*']);
-                       res.append('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
-                       res.append('Access-Control-Allow-Headers', 'Content-Type');
+                       // res.append('Access-Control-Allow-Origin', ['*']);
+                       // res.append('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+                       // res.append('Access-Control-Allow-Headers', 'Content-Type');
                        res.json(list);
                      });
 

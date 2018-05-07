@@ -1,23 +1,27 @@
 const rdiCollection = require('../models/RDICollection');
+const User = require('../models/User');
 const foodDataCollection = require('../models/foodDataCollection');
-// const UserDailyDietSchema = require('../models/userDailyDiet');
-// const foodItemCollection = UserDailyDietSchema.foodItemCollection;
+const { check, validationResult } = require('express-validator/check');
+const { matchedData, sanitize } = require('express-validator/filter');
+const passport = require('passport');
+
 
 module.exports.get_RDISet = function(req, res, next) {
-  console.log("here", req.params.sex, req.params.age);
+  // console.log(req.user);
+  // console.log("here", req.params.sex, req.params.age);
   const sex = req.params.sex;
   const age = req.params.age;
 
-  res.append('Access-Control-Allow-Origin', ['*']);
-  res.append('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
-  res.append('Access-Control-Allow-Headers', 'Content-Type');
+  // res.append('Access-Control-Allow-Origin', ['*']);
+  // res.append('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+  // res.append('Access-Control-Allow-Headers', 'Content-Type');
 
 
 
   if(sex === "default" && age === "default") {
     rdiCollection.findOne(function(err, RDISet) {
       if (err) {next(err);}
-      console.log(RDISet);
+      // console.log(RDISet);
       res.json(RDISet);
     });
   }
@@ -93,8 +97,108 @@ module.exports.save_foodData = function(req, res, next) {
       if(err) {return next(err);}
     })
   };
-  res.append('Access-Control-Allow-Origin', ['*']);
-  res.append('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
-  res.append('Access-Control-Allow-Headers', 'Content-Type');
+  // res.append('Access-Control-Allow-Origin', ['*']);
+  // res.append('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+  // res.append('Access-Control-Allow-Headers', 'Content-Type');
   res.send("done");
 }
+
+module.exports.signup_User = [
+  check('firstName',"First Name Required!").isLength({min: 1}),
+  check('lastName', "Last Name Required!").isLength({min:1}),
+  check('email', "Email Required!").isEmail(),
+  check('username', "Username is Required!").isLength({min:1}),
+  check('password', "Password must be at least 6 characters!").isLength({min:6}),
+
+  (req,res,next) => {
+    // res.append('Access-Control-Allow-Origin', ['*']);
+    // res.append('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+    // res.append('Access-Control-Allow-Headers', 'Content-Type');
+
+    // console.log(req.body);
+
+    const errors = validationResult(req);
+
+    if(!errors.isEmpty()) {
+      res.json(errors.array());
+    } else {
+      const newUser = new User({
+        firstName: req.body.firstName,
+        lastName: req.body.lastName,
+        email: req.body.email,
+        username: req.body.username,
+        password: req.body.password
+      })
+
+      User.createUser(newUser,function(err, user) {
+        if(err) {next(err);}
+      });
+
+      res.json("success");
+    }
+  }
+];
+
+module.exports.login_User = function(req, res, next) {
+  // const validationResult = validateLoginForm(req.body);
+  // if (!validationResult.success) {
+  //   return res.status(400).json({
+  //     success: false,
+  //     message: validationResult.message,
+  //     errors: validationResult.errors
+  //   });
+  // }
+
+
+  return passport.authenticate('local-login', (err, token, userData) => {
+    if (err) {
+      return res.status(400).json({
+        success: false,
+        message: err.message
+      });
+    }
+
+
+    return res.json({
+      success: true,
+      message: 'You have successfully logged in!',
+      token,
+      user: userData
+    });
+  })(req, res, next);
+};
+
+
+
+module.exports.test = function(req, res, next) {
+  // console.log("seshUser", req.user)
+  // console.log("req.session", req.session);
+  // res.append('Access-Control-Allow-Origin', ['*']);
+  // res.append('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+  // res.append('Access-Control-Allow-Headers', 'Content-Type');
+  res.send(req.user);
+}
+
+// console.log("arguments", arguments);
+// if (err) { return next(err); }
+// if (!user) { return res.redirect('http://localhost:3000/admin/login'); }
+// req.logIn(user, function(err) {
+//   if (err) { return next(err); }
+//   return res.redirect('http://localhost:3000/');
+// });
+
+
+  // const firstName = req.body.firstName;
+  // const lastName = req.body.lastName;
+  // const email= req.body.email;
+  // const username = req.body.username;
+  // const password = req.body.password;
+
+
+//
+//   console.log(firstName);
+//   res.append('Access-Control-Allow-Origin', ['*']);
+//   res.append('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+//   res.append('Access-Control-Allow-Headers', 'Content-Type');
+//   res.send("morency");
+// }
