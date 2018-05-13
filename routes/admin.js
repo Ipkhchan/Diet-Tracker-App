@@ -40,8 +40,6 @@ const adminController = require('../controllers/adminController');
 //   });
 // });
 
-router.get('/metrics/:sex/:age', adminController.get_RDISet);
-router.get('/test', adminController.test);
 router.post('/metrics', adminController.save_RDISet);
 router.post('/foodData', adminController.save_foodData);
 router.post('/signup', adminController.signup_User);

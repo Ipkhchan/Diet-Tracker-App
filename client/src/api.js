@@ -59,7 +59,7 @@ dietTracker.getNutrients = function(itemName) {
 //TODO: desired nutrients should be fed into to dietTracker. It should be external
 //to the module
 dietTracker.filterTrackedNutrients = function(nutrient) {
-  if ([203, 204, 205, 208, ,291, 301, 303, 304, 305, 306, 307, 309, 312, 313, 315, 317,
+  if ([203, 204, 205, 208, 291, 301, 303, 304, 305, 306, 307, 309, 312, 313, 315, 317,
         318, 321, 322, 323, 324, 325, 326, 401, 404, 405, 406, 410, 415, 417, 418, 421, 430,
         501, 502, 503, 504, 505, 506, 507, 508, 509, 510, 511, 512, 513, 514, 515, 516, 517,
         518, 521, 601, 605, 606, 617, 621, 629, 630, 631, 645, 646, 671, 672, 675, 685, 851, 852,
@@ -179,7 +179,7 @@ dietTracker.addNutrientInfo = function(nutrientInfo) {
 //for that foor item
   nutrientInfo.forEach(function(attribute) {
     dietTracker.nutrientCodes.forEach(function(nutrientCode) {
-      if (attribute.attr_id == nutrientCode.code) {
+      if (attribute.attr_id === nutrientCode.code) {
           dietTracker.nutrientTracker[foodItem][nutrientCode.nutrient]= attribute.value;
           //dietTracker.nutrientTracker[foodItem].nutrients.push([nutrientCode.nutrient, attribute.value]);
       }

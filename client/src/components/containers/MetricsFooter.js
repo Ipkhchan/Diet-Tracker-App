@@ -1,12 +1,6 @@
 import React, { Component } from 'react';
-import $ from 'jquery';
 
 class MetricsFooter extends Component {
-  constructor(props) {
-    super(props);
-    // this.state = {metrics: {}};
-  }
-
   componentWillUpdate() {
     console.log(this.props.metrics);
   }
@@ -40,7 +34,7 @@ class MetricsFooter extends Component {
         <tr>
           <td>RDI</td>
             {this.props.headers.map((header) =>
-              (header != "name")
+              (header !== "name")
               ? <td key={header+"-rdi"}>{this.props.metrics[header] || ""}</td>
               : null
             )}

@@ -16,7 +16,7 @@ const NutritionTableTotals = (props) => {
       <tr>
         {Object.keys(footerData).map((footer) =>
           <td key={footer + "-footer"}>
-            {typeof footerData[footer].dietAmount == "number"
+            {typeof footerData[footer].dietAmount === "number"
             ? Math.round(footerData[footer].dietAmount*10)/10
             : footerData[footer]}
           </td>

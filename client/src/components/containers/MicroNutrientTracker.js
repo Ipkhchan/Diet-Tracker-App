@@ -18,6 +18,7 @@ class MicroNutrientTracker extends Component {
   // handleNutritiousFoodSearch() {
     $.ajax({
       url: 'http://localhost:5000/users/' + this.props.dietTotal,
+      headers: {'Authorization': `bearer ${localStorage.getItem('token')}`},
       method:'POST',
       dataType:'JSON',
     }).then((res) => {
@@ -33,14 +34,14 @@ class MicroNutrientTracker extends Component {
     console.log(e.type);
     // clearTimeout(showBreakdown);
     if(e.type === "mouseover") {
-      var showBreakdown = setTimeout(function() {
+      setTimeout(function() {
         this.setState({breakDownIsShowing: true});
       }.bind(this), 100);
       // this.setState({breakDownIsShowing: true});
       // console.log("done");
     }
     else if (e.type === "mouseleave") {
-      var hideBreakdown = setTimeout(function() {
+      setTimeout(function() {
         this.setState({breakDownIsShowing: false});
       }.bind(this), 100);
       // if(showBreakdown) {

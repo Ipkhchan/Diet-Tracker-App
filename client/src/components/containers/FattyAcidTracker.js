@@ -20,8 +20,7 @@ class FattyAcidTracker extends Component {
     const nutritionData = this.props.nutritionData;
     const fattyAcidSums = {"omega3": 0, "omega6": 0, "omega9": 0}
 
-    console.log(nutritionData);
-    for (let [foodItemName, foodItem] of Object.entries(nutritionData)){
+    for (let [, foodItem] of Object.entries(nutritionData)){
       for (let metric in foodItem) {
         if (/omega3\w*/.test(metric)) {
           fattyAcidSums.omega3 += foodItem[metric];
@@ -34,7 +33,6 @@ class FattyAcidTracker extends Component {
         }
       }
     }
-    console.log(fattyAcidSums);
 
     return (
       <div>

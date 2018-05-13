@@ -6,38 +6,6 @@ const { matchedData, sanitize } = require('express-validator/filter');
 const passport = require('passport');
 
 
-module.exports.get_RDISet = function(req, res, next) {
-  // console.log(req.user);
-  // console.log("here", req.params.sex, req.params.age);
-  const sex = req.params.sex;
-  const age = req.params.age;
-
-  // res.append('Access-Control-Allow-Origin', ['*']);
-  // res.append('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
-  // res.append('Access-Control-Allow-Headers', 'Content-Type');
-
-
-
-  if(sex === "default" && age === "default") {
-    rdiCollection.findOne(function(err, RDISet) {
-      if (err) {next(err);}
-      // console.log(RDISet);
-      res.json(RDISet);
-    });
-  }
-  else {
-    rdiCollection.
-      findOne({
-        sex: sex,
-        "age_min": {$lte: age},
-        "age_max": {$gte: age}}).
-      exec(function(err,RDISet) {
-       if(err) {next(err);}
-       res.json(RDISet);
-     });
-  }
-};
-
 //TODO: Instead of deleting and recreating RDISets as an update sequence, try actually updating?
 //TODO: Try implementing indexing so searches are quicker.
 module.exports.save_RDISet = function(req, res, next) {
@@ -168,16 +136,6 @@ module.exports.login_User = function(req, res, next) {
   })(req, res, next);
 };
 
-
-
-module.exports.test = function(req, res, next) {
-  // console.log("seshUser", req.user)
-  // console.log("req.session", req.session);
-  // res.append('Access-Control-Allow-Origin', ['*']);
-  // res.append('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
-  // res.append('Access-Control-Allow-Headers', 'Content-Type');
-  res.send(req.user);
-}
 
 // console.log("arguments", arguments);
 // if (err) { return next(err); }

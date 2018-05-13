@@ -7,7 +7,7 @@ const NutritionTableRow = (props) => {
       <tr>
         {headers.map((header) =>
           <td key={foodItem.name + "-" + header}>
-            {typeof foodItem[header] == "number" ? Math.round(foodItem[header]*10)/10 : foodItem[header]}
+            {typeof foodItem[header] === "number" ? Math.round(foodItem[header]*10)/10 : foodItem[header]}
           </td>
         )}
       </tr>

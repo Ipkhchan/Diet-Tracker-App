@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import $ from 'jquery';
 // import FoodRecommendationsList from '../common/FoodRecommendationsList'
 import DeficiencyItem from './DeficiencyItem'
 

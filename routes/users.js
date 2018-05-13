@@ -12,4 +12,6 @@ router.post('/', userController.save_fooditem_data);
 
 router.post('/:deficiency', userController.get_nutritiousfood_data);
 
+router.get('/metrics/:sex/:age', userController.get_RDISet);
+
 module.exports = router;

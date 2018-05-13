@@ -2,9 +2,9 @@ import React, { Component } from 'react';
 import {
   BrowserRouter as Router,
   Route,
-  Link,
+  // Link,
   Switch,
-  Redirect
+  // Redirect
 } from "react-router-dom";
 import './App.css';
 import AdminMetricsPage from './components/containers/AdminMetricsPage'
@@ -14,6 +14,9 @@ import AdminSignUpPage from './components/common/AdminSignUpPage'
 import AdminSignUpSuccess from './components/common/AdminSignUpSuccess'
 import LoginPage from './components/containers/LoginPage'
 import Tracker from './components/containers/Tracker'
+
+import {connect} from 'react-redux';
+// import { toggleIsLoggedIn } from './actions'
 
 
 // App
@@ -34,12 +37,15 @@ import Tracker from './components/containers/Tracker'
 class App extends Component {
   constructor(props) {
     super(props);
-    this.isUserAuthenticated = this.isUserAuthenticated.bind(this);
+    this.logoutUser = this.logoutUser.bind(this);
+    this.state = {logoutMessage: null}
   }
 
-  isUserAuthenticated() {
-    console.log(localStorage.getItem('token') !== null);
-    return localStorage.getItem('token') !== null;
+  logoutUser() {
+    localStorage.removeItem('token');
+    this.setState({logoutMessage: "Successfully Logged Out!"});
+    this.props.dispatch({type: 'TOGGLE'});
+    window.location.assign("http://localhost:3000/")
   }
 
   render() {
@@ -51,14 +57,23 @@ class App extends Component {
     "riboflavin", "niacin", "vitamin-B6", "folate", "vitamin-B12", "pantothenic-acid",
     "biotin", "choline"];
 
+    console.log("App.js//redux", this.props.isLoggedIn);
+
     return (
       <div>
+        {this.state.logoutMessage
+          ? <p className = "centered-popup">
+              {this.state.logoutMessage}
+            </p>
+          : null
+        }
+
         <div className="row-0">
           <ul className="topnav flex">
               <li><a href="#home" className="menuBar">&#9776;</a></li>
               <li><a href="/">Dashboard</a></li>
-              {this.isUserAuthenticated()
-                ? <li><a href="/admin/logout">Logout</a></li>
+              {(this.props.isLoggedIn)
+                ? <li><a href="#home" onClick= {this.logoutUser}>Logout</a></li>
                 : <div className= "flex">
                     <li><a href="/admin/login">Login</a></li>
                     <li><a href="/admin/signup">Sign Up</a></li>
@@ -70,7 +85,7 @@ class App extends Component {
 
         <Router>
           <Switch>
-              <Route exact path="/" render={()=><Tracker metrics={metrics}/>} />
+              <Route exact path="/" render={()=><Tracker metrics={metrics} isLoggedIn={this.state.isLoggedIn}/>} />
               <Route path="/admin/signup" render={()=><AdminSignUpPage/>}/>
               <Route path="/admin/signupSuccess" render={()=><AdminSignUpSuccess/>}/>
               <Route path="/admin/login" render={()=><LoginPage/>}/>
@@ -84,4 +99,12 @@ class App extends Component {
   }
 };
 
-export default App;
+const mapStateToProps = (state) => ({
+  isLoggedIn: state.isLoggedIn
+})
+
+// const mapDispatchToProps = (dispatch) => ({
+//   onUpdate: () => dispatch(toggleIsLoggedIn())
+// })
+
+export default connect(mapStateToProps)(App);

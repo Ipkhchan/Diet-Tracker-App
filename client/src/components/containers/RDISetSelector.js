@@ -1,11 +1,6 @@
 import React, {Component} from 'react';
-import $ from 'jquery';
 
 class RDISetSelector extends Component {
-  constructor(props) {
-    super(props);
-    // this.getRDISet = this.getRDISet.bind(this);
-  }
 
   // getRDISet(e) {
   //   e.preventDefault();

@@ -159,3 +159,11 @@ a {
     padding-left: 10px;
 
 }
+
+/* for pop-ups that need to be centered */
+.centered-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}

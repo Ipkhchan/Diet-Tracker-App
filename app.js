@@ -18,7 +18,6 @@ var cors = require('cors')
 
 // var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
-var apiRouter = require('./routes/api');
 var adminRouter = require('./routes/admin');
 const authcheckController = require('./controllers/authcheckController');
 
@@ -88,7 +87,7 @@ app.use(function(req, res, next) {
 });
 
 app.use(function(req, res, next) {
-  console.log("req.user//app.js", req.user);
+  // console.log("req.user//app.js", req.user);
   // console.log("req.isAuthenticated//app.js", req.isAuthenticated());
   // console.log("req.cookies//app.js", req.cookies);
   // console.log("req.session//app.js", req.session);
@@ -104,7 +103,6 @@ app.use('/users', authcheckController);
 
 // app.use('/', indexRouter);
 app.use('/users', usersRouter);
-app.use('/api', apiRouter);
 app.use('/admin', adminRouter);
 
 // catch 404 and forward to error handler

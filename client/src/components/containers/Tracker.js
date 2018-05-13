@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import {connect} from 'react-redux';
 import $ from 'jquery';
 import dietTracker from '../../api.js'
 import SearchBar from './SearchBar'
@@ -6,28 +7,30 @@ import RDISetSelector from './RDISetSelector'
 import ResultsList from '../common/ResultsList'
 import SelectedItemsList from '../common/SelectedItemsList'
 import NutritionTable from './NutritionTable'
-import DeficiencyList from './DeficiencyList'
 import MicroNutrientsTracker from './MicroNutrientsTracker'
 import FattyAcidTracker from './FattyAcidTracker'
+import MacroNutrientsTracker from './MacroNutrientsTracker'
+import DietNamePopup from '../common/DietNamePopup'
 
 class Tracker extends Component {
   constructor(props) {
     super(props);
     this.handleNutritionDataChange = this.handleNutritionDataChange.bind(this);
     this.handleSearch = this.handleSearch.bind(this);
-    this.handleKeyPress = this.handleKeyPress.bind(this);
     this.handleSelectItem = this.handleSelectItem.bind(this);
     this.saveDietData = this.saveDietData.bind(this);
     this.analyzeDiet = this.analyzeDiet.bind(this);
     this.sumDietTotals = this.sumDietTotals.bind(this);
     this.getRDISet = this.getRDISet.bind(this);
-    this.test = this.test.bind(this);
+    this.promptDietName = this.promptDietName.bind(this);
+    this.submitDietName = this.submitDietName.bind(this);
     // this.toggleDeficiencyList = this.toggleDeficiencyList.bind(this);
     // this.handleNutritiousFoodSearch = this.handleNutritiousFoodSearch.bind(this);
     this.state = {nutritionData: {},
                   searchResults: [],
                   dietTotals: {},
                   metrics:{},
+                  showDietNamePopup: false
                   // deficiencyListIsShowing:false
                 };
   }
@@ -50,7 +53,7 @@ class Tracker extends Component {
       method:'GET',
       dataType:'JSON'
     }).then((res) => {
-      console.log(res.headers);
+      // console.log(res.headers);
       res.forEach(function(foodItem) {
         dietTracker.nutrientTracker[foodItem.name] = foodItem;
       })
@@ -81,7 +84,7 @@ class Tracker extends Component {
       case "itemQuantity":
         const quantityRatio = e.target.value/itemData.quantity;
         for (const category in itemData) {
-          if (typeof itemData[category] == "number") {
+          if (typeof itemData[category] === "number") {
             itemData[category] *= quantityRatio;
           }
         }
@@ -90,11 +93,13 @@ class Tracker extends Component {
         const weightRatio = e.target.value/itemData.amount;
         if (e.target.value > 0) {
           for (const category in itemData) {
-            if (typeof itemData[category] == "number") {
+            if (typeof itemData[category] === "number") {
               itemData[category] *= weightRatio;
             }
           }
         }
+        break;
+      default:
         break;
     }
     const [dietTotals, deficiencyList]= this.analyzeDiet();
@@ -102,17 +107,6 @@ class Tracker extends Component {
     this.setState({nutritionData: nutritionData,
                    dietTotals: dietTotals,
                    deficiencyList: deficiencyList});
-  }
-
-  handleKeyPress(e) {
-    console.log(e.target.classList.value);
-    if (e.keyCode == 13) {
-      if (e.target.classList.contains("search")) {
-        this.handleSearch(e);
-      }
-      else if (e.target.classList.contains("itemQuantity") || e.target.classList.contains("itemWeight"))
-        this.handleNutritionDataChange(e);
-    }
   }
 
   //TODO: USE PROMISE HERE
@@ -139,22 +133,34 @@ class Tracker extends Component {
 
   }
 
-  saveDietData(e) {
+  saveDietData(e, dietName) {
+    console.log("saving ", dietTracker.nutrientTracker);
+    console.log(dietName);
+    $.ajax({
+      url: 'http://localhost:5000/users/',
+      headers: {'Authorization': `bearer ${localStorage.getItem('token')}`},
+      method:'POST',
+      dataType:'text',
+      processData: 'false',
+      data: {"name": dietName, "items": dietTracker.nutrientTracker}
+    }).then(function(res) {
+      alert(res);
+    });
+  }
+
+  promptDietName() {
     if (Object.keys(dietTracker.nutrientTracker).length) {
-      console.log("saving ", dietTracker.nutrientTracker);
-      $.ajax({
-        url: 'http://localhost:5000/users/',
-        headers: {'Authorization': `bearer ${localStorage.getItem('token')}`},
-        method:'POST',
-        dataType:'text',
-        processData: 'false',
-        data: dietTracker.nutrientTracker
-      }).then(function(res) {
-        alert(res);
-      });
+      this.setState({showDietNamePopup: true})
     }
     else return;
   }
+
+  submitDietName() {
+    const dietName = document.querySelector("#dietName").value;
+    this.saveDietData(null, dietName);
+  }
+
+  //TODO: fix form submittal handling to be cleaner
 
   sumDietTotals(nutritionData) {
     const totals = {};
@@ -193,21 +199,6 @@ class Tracker extends Component {
     // this.handleNutritiousFoodSearch(deficiencyList);
   }
 
-  // handleNutritiousFoodSearch(deficiencyList) {
-  //   console.log(deficiencyList);
-  //   $.ajax({
-  //     url: 'http://localhost:5000/users/nutrients',
-  //     method:'POST',
-  //     dataType:'JSON',
-  //     processData: 'false',
-  //     data: deficiencyList
-  //   }).then((res) => {
-  //     // console.log(res);
-  //     this.setState({deficiencyList: deficiencyList, foodRecommendations: res});
-  //     console.log(this.state.foodRecommendations);
-  //   });
-  // }
-
  //TODO: package ajax call into 1 function since getRDISet and ComponentDidMount both
  //use this ajax call
   getRDISet(e) {
@@ -220,38 +211,24 @@ class Tracker extends Component {
       console.log(sex, age);
     }
 
-    console.log("here");
-
     $.ajax({
-      url: 'http://localhost:5000/admin/metrics/' + sex.value +'/' + age.value,
+      url: 'http://localhost:5000/users/metrics/' + sex.value +'/' + age.value,
       headers: {'Authorization': `bearer ${localStorage.getItem('token')}`},
       method:'GET',
       dataType:'JSON'
     }).then((res) => {
-      console.log(res);
       this.setState({metrics: res});
     }).then(() => {
       const dietTotals = this.sumDietTotals(dietTracker.nutrientTracker);
       this.setState({nutritionData: dietTracker.nutrientTracker, dietTotals: dietTotals});
-      console.log("dietTotals", this.state.dietTotals);
     })
   }
 
-  test() {
-    $.ajax({
-      url: 'http://localhost:5000/admin/test',
-      headers: {'Authorization': `bearer ${localStorage.getItem('token')}`},
-      method:'GET',
-      dataType:'JSON'
-    }).then((res) => {
-      console.log(res);
-    });
-  }
-
   render() {
-    console.log("cookie", document.cookie);
+    console.log("Tracker//redux", this.props.isLoggedIn);
+
     return (
-      <div onKeyUp={this.handleKeyPress}>
+      <div>
         <SearchBar className="searchBar" handleSearch={this.handleSearch}/>
         <RDISetSelector getRDISet={this.getRDISet}/>
         <ResultsList searchResults={this.state.searchResults || []}
@@ -263,18 +240,23 @@ class Tracker extends Component {
                                  nutritionData={this.state.nutritionData}
                                  handleNutritionDataChange={this.handleNutritionDataChange}
               />
-              <button onClick= {this.test}>
-                Test
-              </button>
-              <button onClick= {this.saveDietData}
-                      style= {{float: "right"}}>
-                Save
-              </button>
+              {(this.props.isLoggedIn)
+                ?<button onClick= {this.promptDietName}
+                        style= {{float: "right"}}>
+                   Save
+                 </button>
+                :<p>Log In or Sign Up to save your diet!</p>
+              }
+              {(this.state.showDietNamePopup)
+                ? <DietNamePopup submitDietName = {this.submitDietName}/>
+                : null
+              }
               <NutritionTable className="table itemTable" nutritionData={this.state.nutritionData}
                                                           dietTotals={this.state.dietTotals}
                                                           metrics={this.state.metrics}
               />
               <FattyAcidTracker nutritionData={this.state.nutritionData}/>
+              <MacroNutrientsTracker dietTotals={this.state.dietTotals}/>
               <MicroNutrientsTracker nutritionData={this.state.nutritionData}
                                     dietTotals={this.state.dietTotals}
               />
@@ -287,11 +269,8 @@ class Tracker extends Component {
   };
 }
 
-// {(this.state.deficiencyListIsShowing)
-//   ? <DeficiencyList dietTotals = {this.state.dietTotals}
-//                     // foodRecommendations = {this.state.foodRecommendations}
-//     />
-//   : null
-// }
+const mapStateToProps = (state) => ({
+    isLoggedIn: state.isLoggedIn
+});
 
-export default Tracker
+export default connect(mapStateToProps)(Tracker);

@@ -9,7 +9,7 @@ const NutritionTableRows = (props) => {
       {Object.keys(nutritionData).map((foodItem) =>
         <NutritionTableRow key={nutritionData[foodItem].name} foodItem={nutritionData[foodItem]} headers={props.headers}/>
       )}
-      <NutritionTableTotals className="itemTableTotals" nutritionData = {nutritionData} headers={props.headers} dietTotals = {props.dietTotals}/>
+      <NutritionTableTotals className="itemTableTotals" headers={props.headers} dietTotals = {props.dietTotals}/>
     </tbody>
   )
 };

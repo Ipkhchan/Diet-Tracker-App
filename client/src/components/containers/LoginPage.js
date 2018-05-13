@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import {connect} from 'react-redux';
 import $ from 'jquery';
 
 class LoginPage extends Component {
@@ -21,7 +22,7 @@ class LoginPage extends Component {
       if(res.success) {
         localStorage.setItem('token', res.token);
         this.setState({messages: res.message})
-        // window.location.assign("http://localhost:3000/")
+        this.props.dispatch({type: 'TOGGLE'});
       } else {
         this.setState({messages: res.message})
       }
@@ -53,4 +54,4 @@ class LoginPage extends Component {
   }
 }
 
-export default LoginPage
+export default connect()(LoginPage)

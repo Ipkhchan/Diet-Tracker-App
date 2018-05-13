@@ -10,10 +10,10 @@ class FoodRecommendationsList extends Component {
   handleListDisplay(e) {
     const prevNext = e.target.textContent;
     const foodSubListIndexStart = this.state.foodSubListIndexStart;
-    if (prevNext == "Next" && foodSubListIndexStart < 15) {
+    if (prevNext === "Next" && foodSubListIndexStart < 15) {
       this.setState({foodSubListIndexStart: foodSubListIndexStart + 5})
     }
-    else if (prevNext == "Prev" && foodSubListIndexStart > 0) {
+    else if (prevNext === "Prev" && foodSubListIndexStart > 0) {
       this.setState({foodSubListIndexStart: foodSubListIndexStart - 5})
     }
   }
@@ -24,11 +24,11 @@ class FoodRecommendationsList extends Component {
     const dietTotal = this.props.dietTotal;
     const metric = this.props.metric;
     const isDeficient = dietTotal.dietAmount/dietTotal.rdi < 1 ? true : false ;
-    const deficiency = this.props.deficiency;
+
     return (
       <div>
-        {foodRecommendations.slice(foodSubListIndexStart,foodSubListIndexStart + 5).
-                             map(foodRecommendation =>
+        {foodRecommendations.slice(foodSubListIndexStart,foodSubListIndexStart + 5)
+                            .map(foodRecommendation =>
           <div key={foodRecommendation.name}>
             <p>{foodRecommendation.name}</p>
             <p>{foodRecommendation[metric] +" per 100g"}</p>
