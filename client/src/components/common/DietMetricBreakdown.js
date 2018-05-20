@@ -10,8 +10,8 @@ const DietMetricBreakdown = (props) => {
                   top: "50%",
                   left: "37.5%",
                   background: "white"}}>
-      {Object.keys(nutritionData).map((foodItem) =>
-        <p key={foodItem}>{foodItem} : {Math.round(nutritionData[foodItem][metric]) || 0}</p>
+      {nutritionData.map((foodItem) =>
+        <p key={foodItem.name}>{foodItem.name} : {Math.round(foodItem[metric]) || 0}</p>
       )}
     </div>
   )

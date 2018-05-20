@@ -35,7 +35,7 @@ class AdminSignUpPage extends Component {
                     {type:"text", name:"lastName", label: "Last Name"},
                     {type:"text", name:"email", label: "Email"},
                     {type:"text", name:"username", label: "Username"},
-                    {type:"text", name:"password", label: "Password"}]
+                    {type:"text", name:"password", label: "Password"}];
     const errors = this.state.errors;
 
     return (
@@ -55,6 +55,17 @@ class AdminSignUpPage extends Component {
             <input type={input.type} name={input.name}></input>
           </div>
         )}
+        <p>Gender :</p>
+        <div>
+          <input type="radio" id="male" name="sex" value="male"/>
+          <label htmlFor="male">male</label>
+          <input type="radio" id="female" name="sex" value="female"/>
+          <label htmlFor="female">female</label>
+        </div>
+        <div>
+          <label htmlFor= "age">age</label>
+          <input type="number" name="age" id="age"/>
+        </div>
         <input type="submit" value="submit" onClick={this.handleSubmit}></input>
       </form>
     )

@@ -19,8 +19,6 @@ class MacroNutrientsTracker extends Component {
                             {name: "protein", calPerGram: 4},
                             {name: "fat", calPerGram: 9}];
 
-    console.log("dietTotals", dietTotals);
-
     return (
       <div>
         <div className= "flex-space-between">

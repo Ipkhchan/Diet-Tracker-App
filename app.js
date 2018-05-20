@@ -16,7 +16,7 @@ var cors = require('cors')
 // var { matchedData, sanitize } = require('express-validator/filter');
 
 
-// var indexRouter = require('./routes/index');
+var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var adminRouter = require('./routes/admin');
 const authcheckController = require('./controllers/authcheckController');
@@ -99,9 +99,8 @@ app.use(function(req, res, next) {
 //   console.log("first");
 //   next()
 // });
+app.use('/', indexRouter);
 app.use('/users', authcheckController);
-
-// app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/admin', adminRouter);
 

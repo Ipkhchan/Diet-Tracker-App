@@ -2,206 +2,118 @@ var userDailyDiet = require('../models/UserDailyDiet');
 var foodDataCollection = require('../models/foodDataCollection');
 var UserCollection = require('../models/User')
 const rdiCollection = require('../models/RDICollection');
-var async = require('async')
 
-//TODO: implement Access-Control-Allow-Origin globally so you don't
-//have to type it out every time
+function getDietNames(user) {
+  console.log("here");
+  console.log("user", user);
+  const dietNames = user.diets.map((diet) => {return {"name": diet.name, "_id": diet._id}});
+  return dietNames;
+}
+
 //TODO: check if food item already exists in database
 module.exports.save_fooditem_data = function(req, res, next) {
-  const diet = req.body;
-  const userId = req.user._id;
-  console.log("diet", diet);
-  console.log("user", userId);
-  const sentFoodNames = Object.keys(req.body.items);
-  const deletedFoodNames = [];
-  let existingFoodNames = [];
-    //TODO: understand how errors work. does return next(err) skip to the next
-    //middleware without running the rest of the code? I'm concerned that
-    //this middleware will send "Saved!", even if there's been an error.
-  // does this async? If so, do i need to use promises to make sure the creation of Allow
-  // the objects occurs
-  //collect all foodItem names stored in database so we can avoid duplicating
-  //existing items
-  //TODO: this code could probably be refactored to be more efficient, better looking
-  //and more robust
+  const sentDiet = req.body;
+  const user = req.user;
+  console.log("sentDiet", sentDiet);
 
-  UserCollection.findById(userId, function(err, user) {
+  if (sentDiet._id) {
+    const existingDiet = user.diets.id(sentDiet._id);
+    existingDiet.items = sentDiet.items;
+  }
+  else {
+    user.diets.push(sentDiet);
+  }
+
+  user.save(function(err) {
     if(err) {next(err);}
-    console.log("findUser", user);
-    user.diets.push(diet);
-    user.save(function(err) {
-      if(err) {next(err);}
-    })
-  })
+    res.json({"message": "Saved!", "dietNames": getDietNames(user)});
+  });
+  //   //TODO: understand how errors work. does return next(err) skip to the next
+  //   //middleware without running the rest of the code? I'm concerned that
+  //   //this middleware will send "Saved!", even if there's been an error.
+  // // does this async? If so, do i need to use promises to make sure the creation of Allow
+  // // the objects occurs
+  // //collect all foodItem names stored in database so we can avoid duplicating
+  // //existing items
+  // //TODO: this code could probably be refactored to be more efficient, better looking
+  // //and more robust
 
-  // userDailyDiet.find({}, 'name', function(err, dbFoodItems) {
-  //   if (err) {return next(err);}
-  //   for (let dbFoodItem in dbFoodItems) {
-  //     const foodName = dbFoodItems[dbFoodItem].name;
-  //     existingFoodNames.push(foodName);
-  //     //if sentFoodNames does not include dbFoodName, that means its been deleted
-  //     //on on the client side, so we should note this down to delete our DB instance
-  //     if(!sentFoodNames.includes(foodName)) {
-  //       deletedFoodNames.push(foodName);
-  //     };
-  //   };
-  //
-  //         // delete: deleteRemovedFoodItems();
-  //   async.parallel([
-  //     //ASYNC Function 1: saveFoodItems
-  //     function(callback) {
-  //       for (let foodItem in foodItems) {
-  //         //check if foodItem already existing in database
-  //         if(existingFoodNames.includes(foodItem)) {
-  //           //if so, check if the quantities match up.
-  //           let existingAmount = 0;
-  //           userDailyDiet.findOne({name: foodItem}, 'amount').exec()
-  //             .then((food) => {
-  //               existingAmount = food.amount;
-  //               //if quantities do not match up, delete the old one, and create a
-  //               //new updated foodItem
-  //               if(foodItems[foodItem].amount != existingAmount) {
-  //                   userDailyDiet.findOneAndRemove({name: foodItem}, function(err) {
-  //                     if (err) {return next(err);}
-  //                   });
-  //                   userDailyDiet.create(foodItems[foodItem], function (err) {
-  //                     if (err) {return next(err);}
-  //                   });
-  //                };
-  //             })
-  //         } else {
-  //           userDailyDiet.create(foodItems[foodItem], function (err) {
-  //              if (err) {return next(err);}
-  //           });
-  //         }
-  //       }
-  //       callback(null);
-  //     },
-  //     //ASYNC function 2: delete removed items
-  //     function(callback) {
-  //       deletedFoodNames.forEach((deletedFoodName) =>
-  //         userDailyDiet.findOneAndRemove({name: deletedFoodName}, function(err) {
-  //           if(err) {return next(err);}
-  //         })
-  //       );
-  //       callback(null);
-  //     }
-  //   ], function(err) {
-  //     if (err) {return next(err);}
-  //     // console.log("headers");
-  //     // res.append('Access-Control-Allow-Origin', ['*']);
-  //     // res.append('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
-  //     // res.append('Access-Control-Allow-Headers', 'Content-Type');
-  //     res.send("Saved!");
-  //    });
-  //  });
 };
 
+module.exports.delete_fooditem_data = function(req, res, next) {
+  const user = req.user;
+  const dietId = req.params.dietName;
+  // console.log("req.user", req.user);
+  // console.log(req.params.dietName);
+  const diet = user.diets.pull(dietId);
+  user.save(function(err) {
+    if(err) {next(err);}
+    res.json({"message": "Deleted!", "dietNames": getDietNames(user)});
+  })
+}
+
 module.exports.get_fooditem_data = function(req, res, next) {
-  console.log("getfoodItemData", req.user._id);
-  userDailyDiet.find({}, {'_id': 0, '__v': 0}, function(err, foodItems) {
-    if (err) {next(err);}
-    // console.log(foodItems);
-    // res.append('Access-Control-Allow-Origin', ['*']);
-    // res.append('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
-    // res.append('Access-Control-Allow-Headers', 'Content-Type');
-    res.json(foodItems);
-  });
+  //if a specific diet name is requested, send that one
+  if(req.params.dietName) {
+    const dietId = req.params.dietName;
+    const diet = req.user.diets.id(dietId);
+    res.json(diet);
+  //otherwise, send along the first diet stored and a list of all diet names stored
+  } else {
+    // const dietNames = getDietNames(req.user);
+    // const dietNames = req.user.diets.map((diet) => {return {"name": diet.name, "_id": diet._id}});
+    res.json({"defaultDiet": req.user.diets[0], "dietNames": getDietNames(req.user)})
+  }
 };
 
 //TODO: add indexes for each nutrient to speed up search. Current search takes a
 //couple seconds to complete.
-// module.exports.get_nutritiousfood_data = function(req, res, next) {
-//   let deficiencyList = req.body;
-//   let nutritiousFoodSearch = {};
-//   for (let deficiency in deficiencyList) {
-//     nutritiousFoodSearch[deficiency] = function(callback) {
-//       foodDataCollection.find({},{'_id': 0, 'name':1, [deficiency]: 1}).sort({[deficiency]:-1}).limit(5).exec(callback);
-//     };
-//   }
-//
-//   async.parallel(nutritiousFoodSearch, function(err, nutritiousFoodList) {
-//     res.append('Access-Control-Allow-Origin', ['*']);
-//     res.append('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
-//     res.append('Access-Control-Allow-Headers', 'Content-Type');
-//     res.json(nutritiousFoodList);
-//   });
-//
-// }
-
-module.exports.get_nutritiousfood_data = function(req, res, next) {
-  const deficiency = req.params.deficiency;
-  // console.log(deficiency);
-
-  // function sendList(err, list) {
-  //   console.log(list);
-  //   // res.append('Access-Control-Allow-Origin', ['*']);
-  //   // res.append('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
-  //   // res.append('Access-Control-Allow-Headers', 'Content-Type');
-  //   // res.json(list);
-  // }
-
-  foodDataCollection.find({},{'_id': 0, 'name':1, [deficiency]: 1}).
-                     sort({[deficiency]:-1}).
-                     limit(20).
-                     exec(function(err,list) {
-                       if(err) {next(err);}
-                       // res.append('Access-Control-Allow-Origin', ['*']);
-                       // res.append('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
-                       // res.append('Access-Control-Allow-Headers', 'Content-Type');
-                       res.json(list);
-                     });
-
-// foodDataCollection.findOne(function(one) {
-//   console.log(one);
-// })
-
-
-  // let deficiencyList = req.params.deficiency
-  // let nutritiousFoodSearch = {};
-  // for (let deficiency in deficiencyList) {
-  //   nutritiousFoodSearch[deficiency] = function(callback) {
-  //     foodDataCollection.find({},{'_id': 0, 'name':1, [deficiency]: 1}).sort({[deficiency]:-1}).limit(5).exec(callback);
-  //   };
-  // }
-  //
-  // async.parallel(nutritiousFoodSearch, function(err, nutritiousFoodList) {
-  //   res.append('Access-Control-Allow-Origin', ['*']);
-  //   res.append('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
-  //   res.append('Access-Control-Allow-Headers', 'Content-Type');
-  //   res.json(nutritiousFoodList);
-  // });
-
-}
 
 module.exports.get_RDISet = function(req, res, next) {
-  // console.log(req.user);
-  // console.log("here", req.params.sex, req.params.age);
-  const sex = req.params.sex;
-  const age = req.params.age;
+  const sex = req.user.sex;
+  const age = req.user.age;
 
-  // res.append('Access-Control-Allow-Origin', ['*']);
-  // res.append('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
-  // res.append('Access-Control-Allow-Headers', 'Content-Type');
+  rdiCollection.
+    findOne({
+      sex: sex,
+      "age_min": {$lte: age},
+      "age_max": {$gte: age}}).
+    exec(function(err,RDISet) {
+     if(err) {next(err);}
+     res.json(RDISet);
+   });
 
-
-
-  if(sex === "default" && age === "default") {
-    rdiCollection.findOne(function(err, RDISet) {
-      if (err) {next(err);}
-      // console.log(RDISet);
-      res.json(RDISet);
-    });
-  }
-  else {
-    rdiCollection.
-      findOne({
-        sex: sex,
-        "age_min": {$lte: age},
-        "age_max": {$gte: age}}).
-      exec(function(err,RDISet) {
-       if(err) {next(err);}
-       res.json(RDISet);
-     });
-  }
+  // let sex = req.params.sex;
+  // let age = req.params.age;
+  //
+  // function getRDISet(sex, age) {
+  //   rdiCollection.
+  //     findOne({
+  //       sex: sex,
+  //       "age_min": {$lte: age},
+  //       "age_max": {$gte: age}}).
+  //     exec(function(err,RDISet) {
+  //      if(err) {next(err);}
+  //      res.json(RDISet);
+  //    });
+  // }
+  //
+  // if (sex && age) {
+  //   if(sex === "default" && age === "default") {
+  //     rdiCollection.findOne(function(err, RDISet) {
+  //       if (err) {next(err);}
+  //       // console.log(RDISet);
+  //       res.json(RDISet);
+  //     });
+  //   }
+  //   else {
+  //     getRDISet(sex, age);
+  //   }
+  // }
+  // else {
+  //   const user = req.user;
+  //   getRDISet(user.sex, user.age);
+  //
+  // }
+  // //if
 };

@@ -17,7 +17,7 @@ class MicroNutrientTracker extends Component {
   componentDidMount() {
   // handleNutritiousFoodSearch() {
     $.ajax({
-      url: 'http://localhost:5000/users/' + this.props.dietTotal,
+      url: 'http://localhost:5000/' + this.props.dietTotal,
       headers: {'Authorization': `bearer ${localStorage.getItem('token')}`},
       method:'POST',
       dataType:'JSON',

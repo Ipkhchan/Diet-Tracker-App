@@ -1,33 +1,6 @@
 import React, { Component } from 'react';
 
 class MetricsFooter extends Component {
-  componentWillUpdate() {
-    console.log(this.props.metrics);
-  }
-
-  componentDidUpdate() {
-    console.log(this.props.metrics)
-    console.log(this.props.metrics.calorie);
-  }
-
-  // componentDidMount() {
-  //   $.ajax({
-  //     url: 'http://localhost:5000/admin/metrics/',
-  //     method:'GET',
-  //     dataType:'JSON'
-  //   }).then((res) => {
-  //     this.setState({metrics: res});
-  //   }).then(() => {
-  //     let deficiencyTracker = [];
-  //     const dietTotals = this.props.dietTotals;
-  //     for (let dietTotal in dietTotals) {
-  //       if (dietTotals[dietTotal] < this.state.metrics[dietTotal]) {
-  //         deficiencyTracker.push(dietTotal);
-  //       }
-  //     };
-  //   })
-  // }
-
   render() {
     return (
       <tfoot>

@@ -16,10 +16,6 @@ class MicroNutrientsTracker extends Component {
     const dietTotals = this.props.dietTotals;
     const nutritionData = this.props.nutritionData;
     const listIsShowing = this.state.listIsShowing;
-    // Object.keys(dietTotals).map((dietTotal) => {
-    //   console.log(dietTotals[dietTotal);
-    // })
-    console.log("nData", this.props.nutritionData);
 
     return (
       <div>

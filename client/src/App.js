@@ -57,8 +57,6 @@ class App extends Component {
     "riboflavin", "niacin", "vitamin-B6", "folate", "vitamin-B12", "pantothenic-acid",
     "biotin", "choline"];
 
-    console.log("App.js//redux", this.props.isLoggedIn);
-
     return (
       <div>
         {this.state.logoutMessage

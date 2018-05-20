@@ -7,7 +7,7 @@ dietTracker.searchResults = [];
 dietTracker.nutrientTracker = [];
 //this collects the names of the selected food items that the user makes changes
 //to so that we can update those food items when saving.
-dietTracker.itemsUpdated = [];
+// dietTracker.itemsUpdated = [];
 
 //IDs and Keys
 dietTracker.Id = "3c51cd82"
@@ -50,7 +50,6 @@ dietTracker.getNutrients = function(itemName) {
       query: itemName
     }
   }).then(function(res) {
-    console.log(res)
     dietTracker.addNutrientInfo(res);
   });
 };
@@ -144,7 +143,7 @@ dietTracker.nutrientCodes = [{code:203, nutrient: "protein"},
                           ];
 
 //create object that stores all selected food items and their nutritional information.
-dietTracker.nutrientTracker = {};
+// dietTracker.nutrientTracker = {};
 
 //NutritionInfo Object Structure
 //{food1: {name: name, amount: value, protein:value, fat: value, cals: value, carb: value},
@@ -162,29 +161,33 @@ dietTracker.nutrientTracker = {};
 dietTracker.addNutrientInfo = function(nutrientInfo) {
   nutrientInfo = nutrientInfo.foods[0];
   const foodItem = nutrientInfo.food_name;
-  dietTracker.nutrientTracker[foodItem]= {};
-  dietTracker.nutrientTracker[foodItem].name = foodItem;
-  //quantity is 1 by default
-  dietTracker.nutrientTracker[foodItem].quantity = 1;
-  dietTracker.nutrientTracker[foodItem].amount = nutrientInfo.serving_weight_grams;
-  // Object.defineProperty(dietTracker.nutrientTracker[foodItem],"defaultServingSize", {
-  //   value: nutrientInfo.serving_weight_grams,
-  //   enumerable: false
-  // })
-  // dietTracker.nutrientTracker[foodItem].nutrients = [];
+  // dietTracker.nutrientTracker[foodItem]= {};
+  // dietTracker.nutrientTracker[foodItem].name = foodItem;
+  // //quantity is 1 by default
+  // dietTracker.nutrientTracker[foodItem].quantity = 1;
+  // dietTracker.nutrientTracker[foodItem].amount = nutrientInfo.serving_weight_grams;
+
+  let foodData = {};
+  foodData.quantity = 1;
+  foodData.amount = nutrientInfo.serving_weight_grams;
+  foodData.name = foodItem;
+
   nutrientInfo = nutrientInfo.full_nutrients.filter(nutrient => dietTracker.filterTrackedNutrients(nutrient));
-  // console.log(nutrientInfo);
+
 
 //populate the food item object nested within nutrientTracker with nutritional info
 //for that foor item
   nutrientInfo.forEach(function(attribute) {
     dietTracker.nutrientCodes.forEach(function(nutrientCode) {
       if (attribute.attr_id === nutrientCode.code) {
-          dietTracker.nutrientTracker[foodItem][nutrientCode.nutrient]= attribute.value;
-          //dietTracker.nutrientTracker[foodItem].nutrients.push([nutrientCode.nutrient, attribute.value]);
+          // dietTracker.nutrientTracker[foodItem][nutrientCode.nutrient]= attribute.value;
+          foodData[nutrientCode.nutrient]= attribute.value;
       }
     });
   });
+
+  dietTracker.nutrientTracker.push(foodData);
+  console.log(dietTracker.nutrientTracker);
 };
 
 export default dietTracker;

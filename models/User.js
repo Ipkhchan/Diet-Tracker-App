@@ -15,7 +15,7 @@ var UserSchema = new Schema({
   age: Number,
   diets: [{
     name: String,
-    items: {
+    items: [{
       name: String,
       quantity: Number,
       amount: Number,
@@ -89,10 +89,11 @@ var UserSchema = new Schema({
       "fatty-acids-saturated": Number,
       "fatty-acids-monounsaturated": Number,
       "fatty-acids-polyunsaturated": Number
-
-    }
+    }]
   }]
 })
+
+
 
 
 

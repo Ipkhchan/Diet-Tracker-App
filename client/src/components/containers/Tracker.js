@@ -1,3 +1,10 @@
+//TODO: tailor the save popup to the case. If current DietName exists, then ask
+// if user wants to save that dietname. If not, then prompt the user for a dietName.
+//tweak save function to allow for both options above.
+//TODO: header should be fixed positioning (always visible);
+//TODO: user should be able to get food suggestions even when logged out.
+//TODO: keep diet name and items packaged together
+
 import React, { Component } from 'react';
 import {connect} from 'react-redux';
 import $ from 'jquery';
@@ -19,16 +26,20 @@ class Tracker extends Component {
     this.handleSearch = this.handleSearch.bind(this);
     this.handleSelectItem = this.handleSelectItem.bind(this);
     this.saveDietData = this.saveDietData.bind(this);
+    this.deleteDietData = this.deleteDietData.bind(this);
     this.analyzeDiet = this.analyzeDiet.bind(this);
     this.sumDietTotals = this.sumDietTotals.bind(this);
     this.getRDISet = this.getRDISet.bind(this);
     this.promptDietName = this.promptDietName.bind(this);
     this.submitDietName = this.submitDietName.bind(this);
+    this.dietSelect = this.dietSelect.bind(this);
     // this.toggleDeficiencyList = this.toggleDeficiencyList.bind(this);
     // this.handleNutritiousFoodSearch = this.handleNutritiousFoodSearch.bind(this);
     this.state = {nutritionData: {},
                   searchResults: [],
                   dietTotals: {},
+                  dietNames: [],
+                  currentDietName: null,
                   metrics:{},
                   showDietNamePopup: false
                   // deficiencyListIsShowing:false
@@ -36,15 +47,18 @@ class Tracker extends Component {
   }
 
   //TODO: micronutrient units some don't match up. might have to adjust schema to include units
-
-
-
+  componentDidUpdate() {
+    console.log("this.state.nutritionData", this.state.nutritionData);
+    console.log("this.state.metrics", this.state.metrics);
+  }
   //TODO: use generators to yield promise control to componentDidMount.
   //reorganize code in componentDidMount so code is easy to follow here.
+  //TODO: don't split up dietName and foodItems. Keep them together, then you don't
+  //have to keep  track of currentDietName. This prevents mismatch anomalies and
+  //makes the app more robust. will require refactoring props and variables passed around.
   componentDidMount() {
     //TODO: Axios
     //TODO: can send multiple ajax calls in parallel?
-    console.log("token", localStorage.getItem('token'));
     $.ajax({
       url: 'http://localhost:5000/users/',
       headers: {
@@ -53,10 +67,13 @@ class Tracker extends Component {
       method:'GET',
       dataType:'JSON'
     }).then((res) => {
-      // console.log(res.headers);
-      res.forEach(function(foodItem) {
-        dietTracker.nutrientTracker[foodItem.name] = foodItem;
-      })
+      dietTracker.nutrientTracker = res.defaultDiet.items;
+      //dietName needs to keep track of ID as well
+      dietTracker.dietNames = res.dietNames;
+      dietTracker.currentDietName = res.dietNames[0];
+      //set nutrientTracker as packaged {name: name, items: []}
+      //for children that need the items, send them only that part of the props
+      //set up redux for dietTracker.nutrientTracker
     }).then(() => {
       this.getRDISet();
     });
@@ -72,14 +89,23 @@ class Tracker extends Component {
   //the user inputs
   handleNutritionDataChange(e) {
     const foodItem = e.target.parentNode.dataset.fooditem;
-    const nutritionData = this.state.nutritionData;
-    const itemData = nutritionData[foodItem];
+    //TODO: Is this considered as altering state directly? If so, need to find another way
+    const nutritionItems = this.state.nutritionData.items;
     const className = e.target.classList.value;
+    let itemData;
+    let foodItemIndex;
 
+
+    nutritionItems.forEach((food) => {
+      if(foodItem == food.name) {
+        itemData = food;
+        foodItemIndex = nutritionItems.indexOf(itemData);
+      }
+    })
 
     switch (className) {
       case "removeItem":
-        delete nutritionData[foodItem];
+        delete nutritionItems.splice(foodItemIndex, 1);
         break;
       case "itemQuantity":
         const quantityRatio = e.target.value/itemData.quantity;
@@ -104,7 +130,9 @@ class Tracker extends Component {
     }
     const [dietTotals, deficiencyList]= this.analyzeDiet();
     // const dietTotals = this.sumDietTotals(nutritionData);
-    this.setState({nutritionData: nutritionData,
+    this.setState({nutritionData: {"name": this.state.nutritionData.name || null,
+                                   "_id": this.state.nutritionData._id || null,
+                                   "items": nutritionItems},
                    dietTotals: dietTotals,
                    deficiencyList: deficiencyList});
   }
@@ -114,7 +142,6 @@ class Tracker extends Component {
     dietTracker.getItem(document.querySelector(".search").value)
     setTimeout(function() {
       this.setState({searchResults: dietTracker.searchResults})
-      console.log(this.state.searchResults)
     }.bind(this), 1000);
 
     // console.log(results);
@@ -128,23 +155,48 @@ class Tracker extends Component {
     dietTracker.getNutrients(foodName);
     setTimeout(function() {
       const dietTotals = this.sumDietTotals(dietTracker.nutrientTracker);
-      this.setState({nutritionData: dietTracker.nutrientTracker, dietTotals: dietTotals})
+      this.setState({nutritionData: {"name": this.state.nutritionData.name || null,
+                                     "items": dietTracker.nutrientTracker},
+                     dietTotals: dietTotals})
     }.bind(this), 1000);
 
   }
 
-  saveDietData(e, dietName) {
-    console.log("saving ", dietTracker.nutrientTracker);
-    console.log(dietName);
+  saveDietData(dietName) {
+    var data = null;
+    //if dietName argument is provided, this indicates that we are to save a new diet.
+    //override this.state.nutritionData's name and id
+    if(dietName) {
+      data = {"name": dietName, "items": this.state.nutritionData.items};
+    }
+    //otherwise, just send our updated existing diet for saving.
+    else {
+      data = this.state.nutritionData;
+    }
     $.ajax({
-      url: 'http://localhost:5000/users/',
+      url: 'http://localhost:5000/users/save',
       headers: {'Authorization': `bearer ${localStorage.getItem('token')}`},
       method:'POST',
-      dataType:'text',
+      dataType:'JSON',
       processData: 'false',
-      data: {"name": dietName, "items": dietTracker.nutrientTracker}
-    }).then(function(res) {
-      alert(res);
+      data: data
+    }).then((res) => {
+      this.setState({dietNames: res.dietNames});
+      alert(res.message);
+    });
+  }
+
+  // {"dietIsNew": dietIsNew, "diet": {"name": dietName, "items": dietTracker.nutrientTracker}}
+
+  deleteDietData() {
+    $.ajax({
+      url: 'http://localhost:5000/users/' + this.state.nutritionData._id + '/delete',
+      headers: {'Authorization': `bearer ${localStorage.getItem('token')}`},
+      method:'GET',
+      dataType:'JSON',
+    }).then((res) => {
+      this.setState({dietNames: res.dietNames});
+      alert(res.message);
     });
   }
 
@@ -157,14 +209,41 @@ class Tracker extends Component {
 
   submitDietName() {
     const dietName = document.querySelector("#dietName").value;
-    this.saveDietData(null, dietName);
+    this.setState({showDietNamePopup: false});
+    this.saveDietData(dietName);
+  }
+
+  //TODO: nutritionData and dietTracker.nutrientTracker are duplicates of the
+  //same data. See if you can tweak the app to use just one. No Redundancy.
+  dietSelect(e) {
+    e.preventDefault();
+    const dietName = document.querySelector('.dietSelector').value;
+    $.ajax({
+      url: 'http://localhost:5000/users/diets/' + dietName,
+      headers: {
+        "Authorization": `bearer ${localStorage.getItem('token')}`,
+      },
+      method:'GET',
+      dataType:'JSON'
+    }).then((res) => {
+      dietTracker.nutrientTracker = res.items;
+      dietTracker.currentDietName = {"name": res.name, "_id": res._id};
+      const dietTotals = this.sumDietTotals(dietTracker.nutrientTracker);
+      this.setState({
+        nutritionData: res,
+        dietTotals: dietTotals,
+        currentDietName: res.name
+      });
+    });
+
   }
 
   //TODO: fix form submittal handling to be cleaner
 
   sumDietTotals(nutritionData) {
     const totals = {};
-    const foodItems = Object.keys(nutritionData);
+    // const foodItems = Object.keys(nutritionData);
+    // console.log("sumDietTotals//foodItems", foodItems);
     const metrics =this.state.metrics;
 
     this.props.metrics.forEach(metric => {
@@ -173,13 +252,20 @@ class Tracker extends Component {
         //numerical data, loop through all the foodItems in the selected List
         //and sum all values for that attribute
         totals[metric] = {dietAmount: 0, rdi: metrics[metric]};
-        foodItems.map(function(foodItem) {
-          //ignore foodItems that don't have that attribute defined or are 0.
-          if(nutritionData[foodItem][metric]) {
-            totals[metric].dietAmount += nutritionData[foodItem][metric];
+
+        // foodItems.map(function(foodItem) {
+        //   //ignore foodItems that don't have that attribute defined or are 0.
+        //   if(nutritionData[foodItem][metric]) {
+        //     totals[metric].dietAmount += nutritionData[foodItem][metric];
+        //   }
+        //   return foodItem;
+        // });
+
+        nutritionData.forEach((foodItem) => {
+          if(foodItem[metric]) {
+            totals[metric].dietAmount += foodItem[metric];
           }
-          return foodItem;
-        });
+        })
       }
     });
     return totals;
@@ -187,7 +273,7 @@ class Tracker extends Component {
 
   analyzeDiet() {
     //compare RDI values and total values
-    const dietTotals = this.sumDietTotals(this.state.nutritionData);
+    const dietTotals = this.sumDietTotals(this.state.nutritionData.items);
     let deficiencyList = {};
     for (let dietTotal in dietTotals) {
       if (dietTotals[dietTotal] < this.state.metrics[dietTotal]) {
@@ -202,17 +288,29 @@ class Tracker extends Component {
  //TODO: package ajax call into 1 function since getRDISet and ComponentDidMount both
  //use this ajax call
   getRDISet(e) {
-    let sex = {value: "default"};
-    let age = {value: "default"};
-
+    let path;
+    console.log("path initial value", path);
+    if (localStorage.getItem('token')) {
+      path = "/users/metrics/";
+    }
+    // let sex = {value: "default"};
+    // let age = {value: "default"};
     if(e) {
       e.preventDefault();
-      [sex, age] = $('.userRDIForm').serializeArray();
-      console.log(sex, age);
+      const [sex, age] = $('.userRDIForm').serializeArray();
+      path = '/metrics/' + sex.value + '/' + age.value;
+      console.log("typeOf Path", typeof path);
     }
 
+    //if user is not logged in and a specific RDI sex/age range has not between
+    //requested, ask for a default RDI set.
+    else if(path === undefined) {
+      path = "/metrics/default/default";
+    }
+    console.log("path", path);
+
     $.ajax({
-      url: 'http://localhost:5000/users/metrics/' + sex.value +'/' + age.value,
+      url: 'http://localhost:5000' + path,
       headers: {'Authorization': `bearer ${localStorage.getItem('token')}`},
       method:'GET',
       dataType:'JSON'
@@ -220,44 +318,71 @@ class Tracker extends Component {
       this.setState({metrics: res});
     }).then(() => {
       const dietTotals = this.sumDietTotals(dietTracker.nutrientTracker);
-      this.setState({nutritionData: dietTracker.nutrientTracker, dietTotals: dietTotals});
+      console.log("about to set state");
+      console.log("dietTracker.dietNames", dietTracker.dietNames);
+      this.setState({nutritionData: {"name": dietTracker.currentDietName.name || null,
+                                     "_id": dietTracker.currentDietName._id || null,
+                                     "items": dietTracker.nutrientTracker},
+                     dietTotals: dietTotals,
+                     dietNames: dietTracker.dietNames,
+                     currentDietName: dietTracker.currentDietName
+                    });
+      console.log("finished component Did Mount")
+
     })
   }
 
   render() {
-    console.log("Tracker//redux", this.props.isLoggedIn);
-
     return (
       <div>
         <SearchBar className="searchBar" handleSearch={this.handleSearch}/>
-        <RDISetSelector getRDISet={this.getRDISet}/>
+        <RDISetSelector getRDISet={this.getRDISet} metrics = {this.state.metrics || {}}/>
         <ResultsList searchResults={this.state.searchResults || []}
                      handleSelectItem={this.handleSelectItem}
         />
-        {(Object.keys(this.state.nutritionData).length)
+        {(this.state.dietNames.length)
+          ? <form onChange={this.dietSelect} onSubmit={this.dietSelect}>
+              <p>Select your Diet:</p>
+              <select className="dietSelector">
+                {this.state.dietNames.map((dietName) =>
+                  <option key={dietName._id} value={dietName._id}>{dietName.name}</option>
+                )}
+              </select>
+              <input type="submit" value="enter"/>
+            </form>
+          : null
+        }
+        {(this.state.nutritionData.items)
           ? <div>
               <SelectedItemsList className="selectedItemsList"
-                                 nutritionData={this.state.nutritionData}
+                                 nutritionData={this.state.nutritionData.items}
                                  handleNutritionDataChange={this.handleNutritionDataChange}
               />
               {(this.props.isLoggedIn)
-                ?<button onClick= {this.promptDietName}
-                        style= {{float: "right"}}>
-                   Save
-                 </button>
+                ?<div style= {{float: "right"}}>
+                  <button onClick= {(e) => this.saveDietData(null, this.state.currentDietName, false)}>
+                    Save
+                  </button>
+                  <button onClick= {this.promptDietName}>
+                    Save as New
+                  </button>
+                  <button onClick= {this.deleteDietData}>
+                    Delete
+                  </button>
+                 </div>
                 :<p>Log In or Sign Up to save your diet!</p>
               }
               {(this.state.showDietNamePopup)
                 ? <DietNamePopup submitDietName = {this.submitDietName}/>
                 : null
               }
-              <NutritionTable className="table itemTable" nutritionData={this.state.nutritionData}
+              <NutritionTable className="table itemTable" nutritionData={this.state.nutritionData.items}
                                                           dietTotals={this.state.dietTotals}
                                                           metrics={this.state.metrics}
               />
-              <FattyAcidTracker nutritionData={this.state.nutritionData}/>
+              <FattyAcidTracker nutritionData={this.state.nutritionData.items}/>
               <MacroNutrientsTracker dietTotals={this.state.dietTotals}/>
-              <MicroNutrientsTracker nutritionData={this.state.nutritionData}
+              <MicroNutrientsTracker nutritionData={this.state.nutritionData.items}
                                     dietTotals={this.state.dietTotals}
               />
             </div>

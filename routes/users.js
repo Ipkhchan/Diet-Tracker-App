@@ -6,12 +6,12 @@ var userController = require('../controllers/userController');
 /* GET users listing. */
 router.get('/', userController.get_fooditem_data);
 
-router.post('/', userController.save_fooditem_data);
+router.post('/save', userController.save_fooditem_data);
 
-// router.post('/nutrients', userController.get_nutritiousfood_data);
+router.get('/:dietName/delete', userController.delete_fooditem_data);
 
-router.post('/:deficiency', userController.get_nutritiousfood_data);
+router.get('/diets/:dietName', userController.get_fooditem_data);
 
-router.get('/metrics/:sex/:age', userController.get_RDISet);
+router.get('/metrics', userController.get_RDISet);
 
 module.exports = router;

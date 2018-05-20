@@ -77,6 +77,9 @@ module.exports.signup_User = [
   check('email', "Email Required!").isEmail(),
   check('username', "Username is Required!").isLength({min:1}),
   check('password', "Password must be at least 6 characters!").isLength({min:6}),
+  check('sex', "Sex is missing!").exists(),
+  check('age', "Age must be a positive number!").custom((value) => value > 0),
+  check('age', "Age must be a number!").custom((value) => !isNaN(value)),
 
   (req,res,next) => {
     // res.append('Access-Control-Allow-Origin', ['*']);
@@ -95,7 +98,9 @@ module.exports.signup_User = [
         lastName: req.body.lastName,
         email: req.body.email,
         username: req.body.username,
-        password: req.body.password
+        password: req.body.password,
+        sex: req.body.sex,
+        age: req.body.age
       })
 
       User.createUser(newUser,function(err, user) {
