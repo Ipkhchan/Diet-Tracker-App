@@ -31,7 +31,7 @@ dietTracker.getItem = function(itemName) {
     }
   })
   .then(function(res) {
-    dietTracker.searchResults = res.common.map(item => item.food_name);
+    dietTracker.searchResults = res.common.map(item => item.food_name).slice(0,5);
     console.log(dietTracker.searchResults);
   })
 };

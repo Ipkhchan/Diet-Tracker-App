@@ -17,8 +17,7 @@ class NutritionTable extends Component {
     //     break;
     // }
     return (
-      <table>
-        <caption>MACRONUTRIENTS</caption>
+      <table className="table itemTable">
         <NutritionTableHeaders className="itemTableHeaders"  headers={this.state.headers}/>
         <NutritionTableRows className="itemTableRows" nutritionData={nutritionData}
                                                       headers={this.state.headers}

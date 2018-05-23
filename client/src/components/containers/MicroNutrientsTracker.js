@@ -18,23 +18,26 @@ class MicroNutrientsTracker extends Component {
     const listIsShowing = this.state.listIsShowing;
 
     return (
-      <div>
-        <div className= "flex-space-between">
-          <p>MICRONUTRIENTS</p>
-          <button onClick= {this.toggleMicronutrientDisplay}>
-            {(listIsShowing) ? "-" : "+"}
-          </button>
+      <div className="card">
+        <div className="card-body">
+          <div className= "flex-space-between">
+            <p className="vcenter">MICRONUTRIENTS</p>
+            <button onClick= {this.toggleMicronutrientDisplay}
+                    className= "btn btn-success">
+              {(listIsShowing) ? "-" : "+"}
+            </button>
+          </div>
+          {(listIsShowing)
+            ?Object.keys(dietTotals).map((dietTotal) =>
+                <MicroNutrientTracker key = {dietTotal}
+                                    dietTotals = {dietTotals}
+                                    dietTotal = {dietTotal}
+                                    nutritionData = {nutritionData}
+                />
+             )
+            :null
+          }
         </div>
-        {(listIsShowing)
-          ?Object.keys(dietTotals).map((dietTotal) =>
-            <MicroNutrientTracker key = {dietTotal}
-                                  dietTotals = {dietTotals}
-                                  dietTotal = {dietTotal}
-                                  nutritionData = {nutritionData}
-            />
-          )
-          :null
-        }
       </div>
     )
   }

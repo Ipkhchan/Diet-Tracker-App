@@ -20,32 +20,39 @@ class MacroNutrientsTracker extends Component {
                             {name: "fat", calPerGram: 9}];
 
     return (
-      <div>
-        <div className= "flex-space-between">
-          <p>MACRONUTRIENTS</p>
-          <button onClick= {this.toggleMacronutrientDisplay}>
-            {(listIsShowing) ? "-" : "+"}
-          </button>
+      <div className="card my-3">
+        <div className="card-body">
+          <div className= "flex-space-between">
+            <p className="vcenter">MACRONUTRIENTS</p>
+            <button onClick= {this.toggleMacronutrientDisplay}
+                    className= "btn btn-success">
+              {(listIsShowing) ? "-" : "+"}
+            </button>
+          </div>
+          {(listIsShowing)
+            ?<div className="card">
+              <div className="card-body">
+                {macronutrients.map((macronutrient) =>
+                  <p key={macronutrient.name}>
+                    {macronutrient.name}
+                    &nbsp;
+                    Total:
+                    &nbsp;
+                    {Math.round(dietTotals[macronutrient.name].dietAmount)}g
+                    &nbsp;
+                    {Math.round(
+                      [(dietTotals[macronutrient.name].dietAmount)*
+                      (macronutrient.calPerGram)/
+                      dietTotals.calorie.dietAmount]*
+                      100)
+                    }% of total calories
+                  </p>
+                )}
+               </div>
+             </div>
+            :null
+          }
         </div>
-        {(listIsShowing)
-          ?macronutrients.map((macronutrient) =>
-            <p key={macronutrient.name}>
-              {macronutrient.name}
-              &nbsp;
-              Total:
-              &nbsp;
-              {Math.round(dietTotals[macronutrient.name].dietAmount)}g
-              &nbsp;
-              {Math.round(
-                [(dietTotals[macronutrient.name].dietAmount)*
-                (macronutrient.calPerGram)/
-                dietTotals.calorie.dietAmount]*
-                100)
-              }% of total calories
-            </p>
-          )
-          :null
-        }
       </div>
     )
   }

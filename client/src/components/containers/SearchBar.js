@@ -4,12 +4,13 @@ import React, { Component } from 'react';
 class SearchBar extends Component {
   render() {
       return (
-        <form onSubmit= {(e) => {
-          e.preventDefault();
-          this.props.handleSearch();
-        }}>
-          <input placeholder="Search" className="search"/>
-          <input type="submit" value="Search" className="searchIcon"/>
+        <form className="form-inline my-2"
+              onSubmit= {(e) => {
+                e.preventDefault();
+                this.props.handleSearch();
+              }}>
+          <input placeholder="Search Food Item" className="form-control search"/>
+          <input type="submit" value="Search" className="btn-sm btn-outline-success mx-2"/>
         </form>
       )
 

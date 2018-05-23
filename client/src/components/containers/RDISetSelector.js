@@ -1,29 +1,43 @@
 import React, {Component} from 'react';
 
 class RDISetSelector extends Component {
-
   render() {
     const metrics = this.props.metrics;
     console.log("RDISetSelector metrics", metrics);
+    console.log("this.props.showRDISetForm", this.props.showRDISetForm);
 
     return (
       <div>
-        {(Object.keys(metrics).length)
-          ?<div>
-            <p>Currently Using RDI Set for {metrics.sex}s aged {metrics.age_min} to {metrics.age_max}.</p>
-            <p>Source: {metrics.source}</p>
-            <button>Change RDI Set</button>
+        {(Object.keys(metrics).length && !this.props.showRDISetForm)
+          ?<div className= "card">
+            <div className= "card-body">
+              <p className= "card-text">Currently Using RDI Set for {metrics.sex}s aged {metrics.age_min} to {metrics.age_max}.</p>
+              <p className= "card-text font-italic font-weight-light">Source: {metrics.source}</p>
+              <button className="btn-sm btn-primary" onClick={this.props.toggleShowRDISetForm}>Change RDI Set</button>
+            </div>
            </div>
-          :<form className= "userRDIForm" onSubmit={this.props.getRDISet}>
-             <p>Enter your gender and age below:</p>
-             <p>Gender :</p>
-             <input type="radio" id="male" name="gender" value="male"/>
-             <label htmlFor="male">male</label>
-             <input type="radio" id="female" name="gender" value="female"/>
-             <label htmlFor="female">female</label>
-             <label htmlFor= "age">age</label>
-             <input type="number" name="age" id="age"/>
-             <input type="submit" value="enter"/>
+          :<form className= "userRDIForm card" onSubmit={this.props.getRDISet}>
+             <div className= "card-body">
+               <p className= "card-title font-weight-bold">Enter your gender and age below:</p>
+               <div className= "row mx-0">
+                 <p className= "card-text col-2 px-0">Gender :</p>
+                 <div className = "col-6">
+                   <div className="form-check form-check-inline">
+                     <input className= "form-check-input" type="radio" id="male" name="gender" value="male"/>
+                     <label className= "form-check-label" htmlFor="male">male</label>
+                   </div>
+                   <div className = "form-check form-check-inline">
+                     <input className= "form-check-input" type="radio" id="female" name="gender" value="female"/>
+                     <label className= "form-check-label" htmlFor="female">female</label>
+                   </div>
+                 </div>
+               </div>
+               <div className="form-group row mx-0">
+                 <label className= "col-2 px-0" htmlFor= "age">Age :</label>
+                 <input className= "form-control col-2" type="number" name="age" id="age"/>
+               </div>
+               <input className= "my-3 btn btn-primary float-right" type="submit" value="enter"/>
+              </div>
            </form>
         }
       </div>

@@ -35,19 +35,19 @@ class LoginPage extends Component {
     return(
       <div>
         {(Object.keys(messages).length)
-          ? <p>{messages}</p>
+          ? <p className="alert alert-success">{messages}</p>
           : null
         }
-        <form className="loginForm flex-column">
-          <div>
+        <form className="loginForm my-3 mx-3">
+          <div className="form-group">
             <label>Username: </label>
-            <input type="text" name="username"></input>
+            <input className="form-control" type="text" name="username"></input>
           </div>
-          <div>
+          <div className="form-group">
             <label>Password: </label>
-            <input type="text" name="password"></input>
+            <input className="form-control" type="text" name="password"></input>
           </div>
-          <input type="submit" value="submit" onClick={this.handleSubmit}/>
+          <input className="btn btn-primary float-right" type="submit" value="submit" onClick={this.handleSubmit}/>
         </form>
       </div>
     )

@@ -6,15 +6,17 @@ const rdiCollection = require('../models/RDICollection');
 function getDietNames(user) {
   console.log("here");
   console.log("user", user);
-  const dietNames = user.diets.map((diet) => {return {"name": diet.name, "_id": diet._id}});
-  return dietNames;
+  const dietNameList = user.diets.map((diet) => {return {"name": diet.name, "_id": diet._id}});
+  console.log("about to return");
+  return dietNameList;
 }
 
 //TODO: check if food item already exists in database
 module.exports.save_fooditem_data = function(req, res, next) {
+
   const sentDiet = req.body;
   const user = req.user;
-  console.log("sentDiet", sentDiet);
+  console.log("sentDiet");
 
   if (sentDiet._id) {
     const existingDiet = user.diets.id(sentDiet._id);
@@ -26,6 +28,9 @@ module.exports.save_fooditem_data = function(req, res, next) {
 
   user.save(function(err) {
     if(err) {next(err);}
+    // const dietNames = getDietNames(user);
+    // const dietNames = user.diets.map((diet) => {return {"name": diet.name, "_id": diet._id}});
+    console.log("coolio");
     res.json({"message": "Saved!", "dietNames": getDietNames(user)});
   });
   //   //TODO: understand how errors work. does return next(err) skip to the next

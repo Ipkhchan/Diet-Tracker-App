@@ -33,6 +33,7 @@ class Tracker extends Component {
     this.promptDietName = this.promptDietName.bind(this);
     this.submitDietName = this.submitDietName.bind(this);
     this.dietSelect = this.dietSelect.bind(this);
+    this.toggleShowRDISetForm = this.toggleShowRDISetForm.bind(this);
     // this.toggleDeficiencyList = this.toggleDeficiencyList.bind(this);
     // this.handleNutritiousFoodSearch = this.handleNutritiousFoodSearch.bind(this);
     this.state = {nutritionData: {},
@@ -41,7 +42,8 @@ class Tracker extends Component {
                   dietNames: [],
                   currentDietName: null,
                   metrics:{},
-                  showDietNamePopup: false
+                  showDietNamePopup: false,
+                  showRDISetForm: false
                   // deficiencyListIsShowing:false
                 };
   }
@@ -88,10 +90,14 @@ class Tracker extends Component {
   //this handles changing the nutrition values based on the food quantity that
   //the user inputs
   handleNutritionDataChange(e) {
-    const foodItem = e.target.parentNode.dataset.fooditem;
+    console.log("handleNutritionDataChange");
+    console.log("target", e.target);
+    const foodItem = e.target.dataset.fooditem;
     //TODO: Is this considered as altering state directly? If so, need to find another way
     const nutritionItems = this.state.nutritionData.items;
-    const className = e.target.classList.value;
+    const targetId = e.target.id;
+    console.log("foodItem", foodItem);
+    console.log("targetId", targetId);
     let itemData;
     let foodItemIndex;
 
@@ -103,7 +109,7 @@ class Tracker extends Component {
       }
     })
 
-    switch (className) {
+    switch (targetId) {
       case "removeItem":
         delete nutritionItems.splice(foodItemIndex, 1);
         break;
@@ -325,66 +331,87 @@ class Tracker extends Component {
                                      "items": dietTracker.nutrientTracker},
                      dietTotals: dietTotals,
                      dietNames: dietTracker.dietNames,
-                     currentDietName: dietTracker.currentDietName
+                     currentDietName: dietTracker.currentDietName,
+                     showRDISetForm: false
                     });
-      console.log("finished component Did Mount")
-
     })
+  }
+
+  toggleShowRDISetForm() {
+    this.setState({showRDISetForm: !this.state.showRDISetForm})
   }
 
   render() {
     return (
-      <div>
+      <div className="px-5">
         <SearchBar className="searchBar" handleSearch={this.handleSearch}/>
-        <RDISetSelector getRDISet={this.getRDISet} metrics = {this.state.metrics || {}}/>
         <ResultsList searchResults={this.state.searchResults || []}
                      handleSelectItem={this.handleSelectItem}
         />
+        <RDISetSelector metrics = {this.state.metrics || {}}
+                        toggleShowRDISetForm= {this.toggleShowRDISetForm}
+                        showRDISetForm= {this.state.showRDISetForm}
+                        getRDISet= {this.getRDISet}/>
+
         {(this.state.dietNames.length)
-          ? <form onChange={this.dietSelect} onSubmit={this.dietSelect}>
-              <p>Select your Diet:</p>
-              <select className="dietSelector">
-                {this.state.dietNames.map((dietName) =>
-                  <option key={dietName._id} value={dietName._id}>{dietName.name}</option>
-                )}
-              </select>
-              <input type="submit" value="enter"/>
+          ? <form className="card my-3" onChange={this.dietSelect} onSubmit={this.dietSelect}>
+              <div className="card-body">
+                <p className= "font-weight-bold">Select your Diet:</p>
+                <select className="dietSelector form-control">
+                  {this.state.dietNames.map((dietName) =>
+                    <option key={dietName._id} value={dietName._id}>{dietName.name}</option>
+                  )}
+                </select>
+                <input type="submit" value="enter" className="btn-sm btn-primary my-3 float-right"/>
+              </div>
             </form>
           : null
         }
         {(this.state.nutritionData.items)
           ? <div>
-              <SelectedItemsList className="selectedItemsList"
-                                 nutritionData={this.state.nutritionData.items}
-                                 handleNutritionDataChange={this.handleNutritionDataChange}
-              />
-              {(this.props.isLoggedIn)
-                ?<div style= {{float: "right"}}>
-                  <button onClick= {(e) => this.saveDietData(null, this.state.currentDietName, false)}>
-                    Save
-                  </button>
-                  <button onClick= {this.promptDietName}>
-                    Save as New
-                  </button>
-                  <button onClick= {this.deleteDietData}>
-                    Delete
-                  </button>
-                 </div>
-                :<p>Log In or Sign Up to save your diet!</p>
-              }
-              {(this.state.showDietNamePopup)
-                ? <DietNamePopup submitDietName = {this.submitDietName}/>
-                : null
-              }
-              <NutritionTable className="table itemTable" nutritionData={this.state.nutritionData.items}
-                                                          dietTotals={this.state.dietTotals}
-                                                          metrics={this.state.metrics}
-              />
-              <FattyAcidTracker nutritionData={this.state.nutritionData.items}/>
-              <MacroNutrientsTracker dietTotals={this.state.dietTotals}/>
-              <MicroNutrientsTracker nutritionData={this.state.nutritionData.items}
+              <div className= "card">
+                <div className = "card-body">
+                  <SelectedItemsList className="selectedItemsList"
+                                     nutritionData={this.state.nutritionData.items}
+                                     handleNutritionDataChange={this.handleNutritionDataChange}
+                  />
+                  {(this.props.isLoggedIn)
+                    ?<div className= "d-flex justify-content-end my-3">
+                      <button onClick= {(e) => this.saveDietData(null, this.state.currentDietName, false)}
+                              className = "btn-sm btn-primary">
+                        Save
+                      </button>
+                      <button onClick= {this.promptDietName}
+                              className = "btn-sm btn-primary mx-3">
+                        Save as New
+                      </button>
+                      <button onClick= {this.deleteDietData}
+                              className = "btn-sm btn-primary">
+                        Delete
+                      </button>
+                     </div>
+                    :<p>Log In or Sign Up to save your diet!</p>
+                  }
+                </div>
+              </div>
+                {(this.state.showDietNamePopup)
+                  ? <DietNamePopup submitDietName = {this.submitDietName}/>
+                  : null
+                }
+                <div className="card my-3">
+                  <div className= "card-body">
+                    <h5 className="card-title font-weight-bold">SUMMARY TABLE</h5>
+                    <NutritionTable nutritionData={this.state.nutritionData.items}
                                     dietTotals={this.state.dietTotals}
-              />
+                                    metrics={this.state.metrics}
+                    />
+                  </div>
+                </div>
+                <FattyAcidTracker nutritionData={this.state.nutritionData.items}/>
+                <MacroNutrientsTracker dietTotals={this.state.dietTotals}/>
+                <MicroNutrientsTracker nutritionData={this.state.nutritionData.items}
+                                      dietTotals={this.state.dietTotals}
+                />
             </div>
           : null
         }

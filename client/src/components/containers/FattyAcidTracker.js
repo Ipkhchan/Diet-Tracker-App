@@ -35,22 +35,27 @@ class FattyAcidTracker extends Component {
     });
 
     return (
-      <div>
-        <div className = "flex-space-between">
-          <p>FATTY ACID RATIO</p>
-          <button onClick= {this.toggleDisplay}>
-            {(listIsShowing) ? "-" : "+"}
-          </button>
+      <div className="card">
+        <div className="card-body">
+          <div className = "flex-space-between">
+            <p className="vcenter">FATTY ACID RATIO</p>
+            <button onClick= {this.toggleDisplay}
+                    className= "btn btn-success">
+              {(listIsShowing) ? "-" : "+"}
+            </button>
+          </div>
+          {(listIsShowing)
+            ? <div className="card">
+                <div className="card-body">
+                  Omega 3: {this.oneDecimal(fattyAcidSums.omega3)} grams <br/>
+                  Omega 6: {this.oneDecimal(fattyAcidSums.omega6)} grams <br/>
+                  Omega 9: {this.oneDecimal(fattyAcidSums.omega9)} grams <br/>
+                  Your Omega 6:3 Ratio is {this.oneDecimal(fattyAcidSums.omega6/fattyAcidSums.omega3)}
+                </div>
+              </div>
+            : null
+          }
         </div>
-        {(listIsShowing)
-          ? <div>
-              Omega 3: {this.oneDecimal(fattyAcidSums.omega3)} grams <br/>
-              Omega 6: {this.oneDecimal(fattyAcidSums.omega6)} grams <br/>
-              Omega 9: {this.oneDecimal(fattyAcidSums.omega9)} grams <br/>
-              Your Omega 6:3 Ratio is {this.oneDecimal(fattyAcidSums.omega6/fattyAcidSums.omega3)}
-            </div>
-          : null
-        }
      </div>
     )
   }

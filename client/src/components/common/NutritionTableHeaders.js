@@ -5,7 +5,7 @@ const NutritionTableHeaders = (props) => {
     <thead>
       <tr>
         {props.headers.map((header) =>
-          <th key={header}>{header}</th>
+          <th key={header} scope="col">{header}</th>
         )}
       </tr>
     </thead>

@@ -64,30 +64,31 @@ class MicroNutrientTracker extends Component {
                         : false;
 
     return (
-      <div>
-        <div className = "flex-space-between">
-          <p>{dietTotal} {' '}
-           ({Math.round(dietTotals[dietTotal].dietAmount)}/{Math.round(dietTotals[dietTotal].rdi)}) {' '}
-           {(isDeficient) ? String.fromCharCode("0x2718") : String.fromCharCode("0x2714")}
-          </p>
-          <div>
-            <p>Get Suggestions of Foods High in this Nutrient</p>
-            <button onClick= {this.toggleFoodList}>
-              {(listIsShowing) ? "-" : "+"}
-            </button>
+      <div className= "card my-3">
+        <div className="card-body">
+          <div className = "d-flex justify-content-between">
+            <p className= "col-5 vcenter px-0">{dietTotal} {' '}
+             ({Math.round(dietTotals[dietTotal].dietAmount)}/{Math.round(dietTotals[dietTotal].rdi)}) {' '}
+             {(isDeficient) ? String.fromCharCode("0x2718") : String.fromCharCode("0x2714")}
+            </p>
+            <div className= "d-flex col-7 px-0 justify-content-end">
+              <p className="vcenter">Get Suggestions of Foods High in this Nutrient</p>
+              <button onClick= {this.toggleFoodList}
+                      className= "btn-sm btn-success ml-3">
+                {(listIsShowing) ? "-" : "+"}
+              </button>
+            </div>
           </div>
-        </div>
-        <div style={{height: 30 + 'px',
-                     background: "blue"}}
-             onMouseOver = {this.handleBreakDownDisplay}
-             onMouseLeave = {this.handleBreakDownDisplay}
-        >
-          <div style= {{height: "100%",
-                        width: `${(isDeficient)
-                                  ? ((dietTotals[dietTotal].dietAmount/dietTotals[dietTotal].rdi)*100)
-                                  : 100}%`,
-                        background: "green"}}
-          />
+          <div className="progress my-3">
+            <div className= "progress-bar"
+                 style= {{height: "100%",
+                          width: `${(isDeficient)
+                                    ? ((dietTotals[dietTotal].dietAmount/dietTotals[dietTotal].rdi)*100)
+                                    : 100}%`,
+                          background: "green"}}
+                  onMouseOver = {this.handleBreakDownDisplay}
+                  onMouseLeave = {this.handleBreakDownDisplay}/>
+          </div>
         </div>
         {(listIsShowing)
         ?<FoodRecommendationsList foodRecommendations= {foodRecommendations}

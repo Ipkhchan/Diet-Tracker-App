@@ -39,12 +39,12 @@ class AdminSignUpPage extends Component {
     const errors = this.state.errors;
 
     return (
-      <form className="signupForm">
-        <h2>Enter Your Information Below</h2>
+      <form className="signupForm" className="my-3 mx-3">
+        <h4>Enter Your Information Below</h4>
         <div>
           {(errors.length)
             ? errors.map((error) =>
-              <p key={error.param}>{error.msg}</p>
+              <p key={error.param} className="alert alert-danger">{error.msg}</p>
               )
             : null
           }
@@ -52,21 +52,23 @@ class AdminSignUpPage extends Component {
         {inputs.map((input) =>
           <div key={input.name} className="form-group">
             <label>{input.label}:</label>
-            <input type={input.type} name={input.name}></input>
+            <input type={input.type} name={input.name} className="form-control"></input>
           </div>
         )}
         <p>Gender :</p>
-        <div>
-          <input type="radio" id="male" name="sex" value="male"/>
-          <label htmlFor="male">male</label>
-          <input type="radio" id="female" name="sex" value="female"/>
-          <label htmlFor="female">female</label>
+        <div className="form-check form-check-inline">
+          <input type="radio" id="male" name="sex" value="male" className="form-check-input"/>
+          <label htmlFor="male" className="form-check-label">male</label>
         </div>
-        <div>
-          <label htmlFor= "age">age</label>
-          <input type="number" name="age" id="age"/>
+        <div className="form-check">
+          <input type="radio" id="female" name="sex" value="female" className="form-check-input"/>
+          <label htmlFor="female" className="form-check-label">female</label>
         </div>
-        <input type="submit" value="submit" onClick={this.handleSubmit}></input>
+        <div className="my-3">
+          <label htmlFor= "age">Age:</label>
+          <input type="number" name="age" id="age" className="form-control"/>
+        </div>
+        <input type="submit" value="submit" onClick={this.handleSubmit} className="btn btn-primary my-3 float-right"></input>
       </form>
     )
   }

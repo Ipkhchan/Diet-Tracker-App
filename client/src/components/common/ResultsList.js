@@ -2,9 +2,11 @@ import React from 'react';
 
 const ResultsList = (props) => {
   return (
-    <ul>
+    <ul className="list-group ">
       {props.searchResults.map((searchResult) =>
-        <li key={searchResult} onClick={props.handleSelectItem}>{searchResult}</li>
+        <button key={searchResult}
+                onClick={props.handleSelectItem}
+                className= "list-group-item list-group-item-action">{searchResult}</button>
       )}
     </ul>
   )

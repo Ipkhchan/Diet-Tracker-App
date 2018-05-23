@@ -60,26 +60,43 @@ class App extends Component {
     return (
       <div>
         {this.state.logoutMessage
-          ? <p className = "centered-popup">
+          ? <p className = "centered-popup alert alert-success">
               {this.state.logoutMessage}
             </p>
           : null
         }
 
-        <div className="row-0">
-          <ul className="topnav flex">
-              <li><a href="#home" className="menuBar">&#9776;</a></li>
-              <li><a href="/">Dashboard</a></li>
+        <nav className="navbar accentColorBackground">
+          <a className="navbar-brand" href="/">HealthyBodies</a>
+
+          <ul className="navbar-nav d-flex flex-row justify-content-end mx-0 col-8">
+              <li className= "nav-item active mx-2">
+                <a href="/" className= "nav-link">Dashboard</a>
+              </li>
               {(this.props.isLoggedIn)
-                ? <li><a href="#home" onClick= {this.logoutUser}>Logout</a></li>
-                : <div className= "flex">
-                    <li><a href="/admin/login">Login</a></li>
-                    <li><a href="/admin/signup">Sign Up</a></li>
+                ? <li className= "nav-item active mx-2">
+                    <a href="#home"
+                       onClick= {this.logoutUser}
+                       className= "nav-link">Logout</a>
+                  </li>
+                : <div className="d-flex">
+                    <li className= "nav-item active mx-2">
+                      <a href="/admin/login"
+                         className= "nav-link">Login</a>
+                    </li>
+                    <li className= "nav-item active mx-2">
+                      <a href="/admin/signup"
+                         className= "nav-link">Sign Up</a>
+                    </li>
                   </div>
               }
-              <li><a href="/admin/metrics">Admin</a></li>
+              <li className= "nav-item active mx-2 ">
+                <a href="/admin/metrics"
+                   className= "nav-link">Admin</a>
+              </li>
           </ul>
-        </div>
+
+        </nav>
 
         <Router>
           <Switch>
