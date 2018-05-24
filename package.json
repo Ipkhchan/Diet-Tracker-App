@@ -3,9 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "client": "cd client && yarn start",
-    "server": "nodemon ./bin/www",
-    "start": "concurrently --kill-others-on-fail \"yarn server\" \"yarn client\""
+    "start": "node ./bin/www",
+    "heroku-postbuild": "cd client && yarn && yarn start"
   },
   "dependencies": {
     "async": "^2.6.0",
@@ -36,6 +35,6 @@
     "eslint-config-google": "^0.9.1"
   },
   "engines": {
-  "node": "8.9.4"
+    "node": "8.9.4"
   }
 }
