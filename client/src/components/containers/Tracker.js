@@ -62,7 +62,7 @@ class Tracker extends Component {
     //TODO: Axios
     //TODO: can send multiple ajax calls in parallel?
     $.ajax({
-      url: 'http://localhost:5000/users/',
+      url: '/users/',
       headers: {
         "Authorization": `bearer ${localStorage.getItem('token')}`,
       },
@@ -180,7 +180,7 @@ class Tracker extends Component {
       data = this.state.nutritionData;
     }
     $.ajax({
-      url: 'http://localhost:5000/users/save',
+      url: '/users/save',
       headers: {'Authorization': `bearer ${localStorage.getItem('token')}`},
       method:'POST',
       dataType:'JSON',
@@ -196,7 +196,7 @@ class Tracker extends Component {
 
   deleteDietData() {
     $.ajax({
-      url: 'http://localhost:5000/users/' + this.state.nutritionData._id + '/delete',
+      url: '/users/' + this.state.nutritionData._id + '/delete',
       headers: {'Authorization': `bearer ${localStorage.getItem('token')}`},
       method:'GET',
       dataType:'JSON',
@@ -225,7 +225,7 @@ class Tracker extends Component {
     e.preventDefault();
     const dietName = document.querySelector('.dietSelector').value;
     $.ajax({
-      url: 'http://localhost:5000/users/diets/' + dietName,
+      url: '/users/diets/' + dietName,
       headers: {
         "Authorization": `bearer ${localStorage.getItem('token')}`,
       },
@@ -316,7 +316,7 @@ class Tracker extends Component {
     console.log("path", path);
 
     $.ajax({
-      url: 'http://localhost:5000' + path,
+      url: path,
       headers: {'Authorization': `bearer ${localStorage.getItem('token')}`},
       method:'GET',
       dataType:'JSON'

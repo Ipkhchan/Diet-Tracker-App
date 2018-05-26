@@ -22,7 +22,7 @@ class AdminFoodDataPage extends Component {
       // console.log(partialResults);
       for (let i = 0; i < results.length -10; i+=10) {
         $.ajax({
-          url: 'http://localhost:5000/admin/foodData',
+          url: '/admin/foodData',
           method:'POST',
           dataType:'JSON',
           processData: 'false',

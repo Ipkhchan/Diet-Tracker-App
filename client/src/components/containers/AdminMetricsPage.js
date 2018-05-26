@@ -16,7 +16,7 @@ class AdminMetricsPage extends Component {
     });
 
     $.ajax({
-      url: 'http://localhost:5000/admin/metrics',
+      url: '/admin/metrics',
       method:'POST',
       dataType:'text',
       processData: 'false',

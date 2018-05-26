@@ -11,6 +11,7 @@ module.exports = (req, res, next) => {
   // console.log("acrh", req.headers["access-control-request-headers"]);
   // if(req.headers["access-control-request-headers"].authorization) {
   // }
+  console.log("headers", req.headers);
   if (!req.headers.authorization) {
     console.log("no authorization header");
     return res.status(401).end();

@@ -26,6 +26,8 @@ module.exports.save_fooditem_data = function(req, res, next) {
     user.diets.push(sentDiet);
   }
 
+  // const dietNames = getDietNames(user);
+
   user.save(function(err) {
     if(err) {next(err);}
     // const dietNames = getDietNames(user);

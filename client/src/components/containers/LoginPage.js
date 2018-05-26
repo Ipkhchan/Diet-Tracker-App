@@ -13,7 +13,7 @@ class LoginPage extends Component {
     e.preventDefault();
     const formData = $('.loginForm').serializeArray();
     $.ajax({
-      url: 'http://localhost:5000/admin/login',
+      url: '/admin/login',
       method:'POST',
       processData: 'false',
       data: formData

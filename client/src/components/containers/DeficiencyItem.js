@@ -19,7 +19,7 @@ class DeficiencyItem extends Component {
   componentDidMount() {
   // handleNutritiousFoodSearch() {
     $.ajax({
-      url: 'http://localhost:5000/users/' + this.props.deficiency,
+      url: this.props.deficiency,
       method:'POST',
       dataType:'JSON',
     }).then((res) => {

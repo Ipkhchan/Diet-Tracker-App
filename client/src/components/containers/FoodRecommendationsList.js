@@ -31,9 +31,8 @@ class FoodRecommendationsList extends Component {
           <div className="list-group">
             {foodRecommendations.slice(foodSubListIndexStart,foodSubListIndexStart + 5)
                                 .map(foodRecommendation =>
-              <div className= "list-group-item">
-                <div key={foodRecommendation.name}
-                     className="d-flex justify-content-between my-3">
+              <div className= "list-group-item" key={foodRecommendation.name}>
+                <div className="d-flex justify-content-between my-3">
                   <p className="my-0">{foodRecommendation.name}</p>
                   <p className="my-0">{foodRecommendation[metric] +" per 100g"}</p>
                 </div>
