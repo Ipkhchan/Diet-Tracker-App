@@ -26,7 +26,9 @@ var app = express(); //starting express
 
 // Set up mongoose connection
 var mongoose = require('mongoose');
-var dev_db_url = 'mongodb://localhost:27017/DietTrackApp'
+// var dev_db_url = 'mongodb://localhost:27017/DietTrackApp'
+var dev_db_url = 'mongodb://heroku_03vrjltb:sn3ufasirlbdvt1knje9ik6o0e@ds135810.mlab.com:35810/heroku_03vrjltb';
+
 // var jwtSecret = "secret"
 var mongoDB = dev_db_url;
 mongoose.connect(mongoDB
