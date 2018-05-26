@@ -14,14 +14,14 @@ class AdminSignUpPage extends Component {
     const formData = $('.signupForm').serializeArray();
     console.log(formData);
     $.ajax({
-      url: 'http://localhost:5000/admin/signup',
+      url: '/admin/signup',
       method:'POST',
       dataType:'JSON',
       processData: 'false',
       data: formData
     }).then((res) => {
       if(res === "success") {
-        window.location.assign("http://localhost:3000/admin/signupSuccess")
+        alert("Thanks for Signing Up!");
       } else {
         console.log(res);
         this.setState({errors: res})
