@@ -39,7 +39,7 @@ class AdminSignUpPage extends Component {
     const errors = this.state.errors;
 
     return (
-      <form className="signupForm" className="my-3 mx-3">
+      <form className="signupForm my-3 mx-3">
         <h4>Enter Your Information Below</h4>
         <div>
           {(errors.length)

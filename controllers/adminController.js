@@ -12,9 +12,9 @@ module.exports.save_RDISet = function(req, res, next) {
   const rdiSetSent = req.body;
   let existingRDISources = [];
 
-  res.append('Access-Control-Allow-Origin', ['*']);
-  res.append('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
-  res.append('Access-Control-Allow-Headers', 'Content-Type');
+  // res.append('Access-Control-Allow-Origin', ['*']);
+  // res.append('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+  // res.append('Access-Control-Allow-Headers', 'Content-Type');
 
   function createRDISet(message) {
     rdiCollection.create(rdiSetSent, function(err) {
@@ -113,19 +113,24 @@ module.exports.signup_User = [
 ];
 
 module.exports.login_User = function(req, res, next) {
-  // const validationResult = validateLoginForm(req.body);
-  // if (!validationResult.success) {
-  //   return res.status(400).json({
-  //     success: false,
-  //     message: validationResult.message,
-  //     errors: validationResult.errors
-  //   });
-  // }
+  console.log("req", req.body);
+  if (!req.body.password.length) {
+    res.json({
+      success: false,
+      message: "Password is Missing"
+    })
+  }
 
+  if (!req.body.username.length) {
+    res.json({
+      success: false,
+      message: "Username is Missing"
+    })
+  }
 
   return passport.authenticate('local-login', (err, token, userData) => {
     if (err) {
-      return res.status(400).json({
+      return res.json({
         success: false,
         message: err.message
       });

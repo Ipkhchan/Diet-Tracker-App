@@ -6,7 +6,7 @@ class LoginPage extends Component {
   constructor(props) {
     super(props);
     this.handleSubmit = this.handleSubmit.bind(this);
-    this.state = {messages: {}}
+    this.state = {alert: {success: false, message: ''}}
   }
 
   handleSubmit(e) {
@@ -21,34 +21,36 @@ class LoginPage extends Component {
       console.log(res);
       if(res.success) {
         localStorage.setItem('token', res.token);
-        this.setState({messages: res.message})
         this.props.dispatch({type: 'TOGGLE'});
-      } else {
-        this.setState({messages: res.message})
       }
+      this.setState({alert: {"success": res.success, "message": res.message}})
     });
   }
 
   render() {
-    const messages = this.state.messages
+    const alert = this.state.alert;
+
 
     return(
       <div>
-        {(Object.keys(messages).length)
-          ? <p className="alert alert-success">{messages}</p>
+        {(alert.message.length)
+          ? <p className={`alert ${(alert.success) ? "alert-success" : "alert-danger"}`}>{alert.message}</p>
           : null
         }
-        <form className="loginForm my-3 mx-3">
-          <div className="form-group">
-            <label>Username: </label>
-            <input className="form-control" type="text" name="username"></input>
-          </div>
-          <div className="form-group">
-            <label>Password: </label>
-            <input className="form-control" type="text" name="password"></input>
-          </div>
-          <input className="btn btn-primary float-right" type="submit" value="submit" onClick={this.handleSubmit}/>
-        </form>
+        {(alert.success == false)
+          ?<form className="loginForm my-3 mx-3">
+            <div className="form-group">
+              <label>Username: </label>
+              <input className="form-control" type="text" name="username"></input>
+            </div>
+            <div className="form-group">
+              <label>Password: </label>
+              <input className="form-control" type="text" name="password"></input>
+            </div>
+            <input className="btn btn-primary float-right" type="submit" value="submit" onClick={this.handleSubmit}/>
+          </form>
+          : null
+        }
       </div>
     )
   }

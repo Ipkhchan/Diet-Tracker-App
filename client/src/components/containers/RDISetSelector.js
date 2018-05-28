@@ -3,8 +3,6 @@ import React, {Component} from 'react';
 class RDISetSelector extends Component {
   render() {
     const metrics = this.props.metrics;
-    console.log("RDISetSelector metrics", metrics);
-    console.log("this.props.showRDISetForm", this.props.showRDISetForm);
 
     return (
       <div>

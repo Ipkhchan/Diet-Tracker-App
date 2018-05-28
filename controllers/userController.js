@@ -18,6 +18,8 @@ module.exports.save_fooditem_data = function(req, res, next) {
   const user = req.user;
   console.log("sentDiet");
 
+  //if there's an id in the nutritionData, that means that this diet has been saved
+  //before and is an existing diet.
   if (sentDiet._id) {
     const existingDiet = user.diets.id(sentDiet._id);
     existingDiet.items = sentDiet.items;

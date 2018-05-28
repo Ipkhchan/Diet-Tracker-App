@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import $ from 'jquery';
 import FoodRecommendationsList from './FoodRecommendationsList';
 import DietMetricBreakdown from '../common/DietMetricBreakdown';
+import dietTracker from '../../api.js'
 
 class MicroNutrientTracker extends Component {
   constructor(props) {
@@ -63,12 +64,17 @@ class MicroNutrientTracker extends Component {
                         ? true
                         : false;
 
+    console.log("MicroNutrientTracker", dietTracker.nutrientUnits);
+
     return (
       <div className= "card my-3">
         <div className="card-body">
           <div className = "d-flex justify-content-between">
             <p className= "col-5 vcenter px-0">{dietTotal} {' '}
-             ({Math.round(dietTotals[dietTotal].dietAmount)}/{Math.round(dietTotals[dietTotal].rdi)}) {' '}
+             ({Math.round(dietTotals[dietTotal].dietAmount)}/{Math.round(dietTotals[dietTotal].rdi)})
+              {' '}
+              {dietTracker.nutrientUnits[dietTotal]}
+              {' '}
              {(isDeficient) ? String.fromCharCode("0x2718") : String.fromCharCode("0x2714")}
             </p>
             <div className= "d-flex col-7 px-0 justify-content-end">

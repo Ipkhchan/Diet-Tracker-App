@@ -45,7 +45,7 @@ class App extends Component {
     localStorage.removeItem('token');
     this.setState({logoutMessage: "Successfully Logged Out!"});
     this.props.dispatch({type: 'TOGGLE'});
-    window.location.assign("http://localhost:3000/")
+    window.location.href = '/';
   }
 
   render() {
@@ -90,10 +90,6 @@ class App extends Component {
                     </li>
                   </div>
               }
-              <li className= "nav-item active mx-2 ">
-                <a href="/admin/metrics"
-                   className= "nav-link">Admin</a>
-              </li>
           </ul>
 
         </nav>

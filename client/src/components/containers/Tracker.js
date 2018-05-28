@@ -32,6 +32,7 @@ class Tracker extends Component {
     this.getRDISet = this.getRDISet.bind(this);
     this.promptDietName = this.promptDietName.bind(this);
     this.submitDietName = this.submitDietName.bind(this);
+    this.handleDietSave = this.handleDietSave.bind(this);
     this.dietSelect = this.dietSelect.bind(this);
     this.toggleShowRDISetForm = this.toggleShowRDISetForm.bind(this);
     // this.toggleDeficiencyList = this.toggleDeficiencyList.bind(this);
@@ -51,7 +52,6 @@ class Tracker extends Component {
   //TODO: micronutrient units some don't match up. might have to adjust schema to include units
   componentDidUpdate() {
     console.log("this.state.nutritionData", this.state.nutritionData);
-    console.log("this.state.metrics", this.state.metrics);
   }
   //TODO: use generators to yield promise control to componentDidMount.
   //reorganize code in componentDidMount so code is easy to follow here.
@@ -162,6 +162,7 @@ class Tracker extends Component {
     setTimeout(function() {
       const dietTotals = this.sumDietTotals(dietTracker.nutrientTracker);
       this.setState({nutritionData: {"name": this.state.nutritionData.name || null,
+                                     "_id": this.state.nutritionData._id,
                                      "items": dietTracker.nutrientTracker},
                      dietTotals: dietTotals})
     }.bind(this), 1000);
@@ -169,6 +170,10 @@ class Tracker extends Component {
   }
 
   saveDietData(dietName) {
+    //save is clicked with dietName.
+    //save is clicked for a new diet (no diet name);
+    //save as new is clicked with dietName.
+    //save as new is clicked for a new diet
     var data = null;
     //if dietName argument is provided, this indicates that we are to save a new diet.
     //override this.state.nutritionData's name and id
@@ -179,6 +184,7 @@ class Tracker extends Component {
     else {
       data = this.state.nutritionData;
     }
+    console.log("saveDietData//data", data);
     $.ajax({
       url: '/users/save',
       headers: {'Authorization': `bearer ${localStorage.getItem('token')}`},
@@ -204,6 +210,16 @@ class Tracker extends Component {
       this.setState({dietNames: res.dietNames});
       alert(res.message);
     });
+  }
+
+  handleDietSave() {
+    console.log("handleDietSave//this.state.currentDietName", this.state.currentDietName);
+    if (this.state.currentDietName) {
+      this.saveDietData(null);
+    }
+    else {
+      this.promptDietName;
+    }
   }
 
   promptDietName() {
@@ -253,7 +269,11 @@ class Tracker extends Component {
     const metrics =this.state.metrics;
 
     this.props.metrics.forEach(metric => {
-      if(["age_min", "age_max", "sex", "source"].indexOf(metric) < 0) {
+      //nutritionix API does not track certain metrics that the RDIs from NIH do.
+      //for now, these will not be summed, as we have no data. However, we will leave
+      //the metric in the RDI in the case that we do get this data.
+      if(["age_min", "age_max", "sex", "source", "chromium", "molybdenum",
+          "chloride", "biotin", "iodine"].indexOf(metric) < 0) {
         // for each header, if the attribute (ex. protein, carb) represents
         //numerical data, loop through all the foodItems in the selected List
         //and sum all values for that attribute
@@ -377,7 +397,7 @@ class Tracker extends Component {
                   />
                   {(this.props.isLoggedIn)
                     ?<div className= "d-flex justify-content-end my-3">
-                      <button onClick= {(e) => this.saveDietData(null, this.state.currentDietName, false)}
+                      <button onClick= {this.handleDietSave}
                               className = "btn-sm btn-primary">
                         Save
                       </button>
