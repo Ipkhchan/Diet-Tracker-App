@@ -61,7 +61,7 @@ app.use(cookieParser());
 
 // For production. use this path. Serve static files from the React app
 if (process.env.NODE_ENV === 'production') {
-  app.use(express.static('client/build'));
+  app.use(express.static(path.join(__dirname, 'client/build')));
 }
 
 
