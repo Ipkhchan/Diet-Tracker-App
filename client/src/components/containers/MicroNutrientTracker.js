@@ -69,15 +69,15 @@ class MicroNutrientTracker extends Component {
     return (
       <div className= "card my-3">
         <div className="card-body">
-          <div className = "d-flex justify-content-between">
-            <p className= "col-5 vcenter px-0">{dietTotal} {' '}
+          <div className = "d-flex flex-column flex-md-row mx-0 justify-content-between">
+            <p className= "vcenter col-md-5 px-0 font-weight-bold">{dietTotal} {' '}
              ({Math.round(dietTotals[dietTotal].dietAmount)}/{Math.round(dietTotals[dietTotal].rdi)})
               {' '}
               {dietTracker.nutrientUnits[dietTotal]}
               {' '}
              {(isDeficient) ? String.fromCharCode("0x2718") : String.fromCharCode("0x2714")}
             </p>
-            <div className= "d-flex col-7 px-0 justify-content-end">
+            <div className= "d-flex col-md-7 px-0 my-2 justify-content-md-end justify-content-between">
               <p className="vcenter">Get Suggestions of Foods High in this Nutrient</p>
               <button onClick= {this.toggleFoodList}
                       className= "btn-sm btn-success ml-3">
@@ -95,14 +95,15 @@ class MicroNutrientTracker extends Component {
                   onMouseOver = {this.handleBreakDownDisplay}
                   onMouseLeave = {this.handleBreakDownDisplay}/>
           </div>
+          {(listIsShowing)
+          ?<FoodRecommendationsList foodRecommendations= {foodRecommendations}
+                                    dietTotal = {dietTotals[dietTotal]}
+                                    isDeficient = {isDeficient}
+                                    metric = {dietTotal}/>
+          :null
+          }
         </div>
-        {(listIsShowing)
-        ?<FoodRecommendationsList foodRecommendations= {foodRecommendations}
-                                  dietTotal = {dietTotals[dietTotal]}
-                                  isDeficient = {isDeficient}
-                                  metric = {dietTotal}/>
-        :null
-        }
+
         {(breakDownIsShowing)
         ?<DietMetricBreakdown nutritionData={nutritionData}
                               metric = {dietTotal}

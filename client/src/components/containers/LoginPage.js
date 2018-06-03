@@ -32,13 +32,13 @@ class LoginPage extends Component {
 
 
     return(
-      <div>
+      <div className="px-2 px-sm-5">
         {(alert.message.length)
           ? <p className={`alert ${(alert.success) ? "alert-success" : "alert-danger"}`}>{alert.message}</p>
           : null
         }
         {(alert.success == false)
-          ?<form className="loginForm my-3 mx-3">
+          ?<form className="loginForm">
             <div className="form-group">
               <label>Username: </label>
               <input className="form-control" type="text" name="username"></input>
@@ -47,7 +47,9 @@ class LoginPage extends Component {
               <label>Password: </label>
               <input className="form-control" type="text" name="password"></input>
             </div>
-            <input className="btn btn-primary float-right" type="submit" value="submit" onClick={this.handleSubmit}/>
+            <div className="d-flex justify-content-end">
+              <input className="btn btn-primary" type="submit" value="submit" onClick={this.handleSubmit}/>
+            </div>
           </form>
           : null
         }

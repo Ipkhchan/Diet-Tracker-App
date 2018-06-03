@@ -37,7 +37,7 @@ class FattyAcidTracker extends Component {
     return (
       <div className="card">
         <div className="card-body">
-          <div className = "flex-space-between">
+          <div className = "flex-space-between my-2">
             <p className="vcenter">FATTY ACID RATIO</p>
             <button onClick= {this.toggleDisplay}
                     className= "btn btn-success">

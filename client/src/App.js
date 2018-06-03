@@ -14,10 +14,10 @@ import AdminSignUpPage from './components/common/AdminSignUpPage'
 import AdminSignUpSuccess from './components/common/AdminSignUpSuccess'
 import LoginPage from './components/containers/LoginPage'
 import Tracker from './components/containers/Tracker'
+import Footer from './components/common/Footer'
 
 import {connect} from 'react-redux';
 // import { toggleIsLoggedIn } from './actions'
-
 
 // App
 // -> SearchBar
@@ -27,6 +27,9 @@ import {connect} from 'react-redux';
 //    -> NutritionTableRows
 //       -> NutritionTableRow
 //    -> NutritionTableFooter
+const navLink = {
+  fontSize: '12px'
+};
 
 //TODO: what to display when there is no nutritionData. What to do if input is 0. Prevent decimal values in table (render without actually changing the data value)
 //TODO: place app initializations in componentDidMount within App
@@ -66,27 +69,27 @@ class App extends Component {
           : null
         }
 
-        <nav className="navbar accentColorBackground">
+        <nav className="navbar accentColorBackground mb-3">
           <a className="navbar-brand" href="/">HealthyBodies</a>
 
-          <ul className="navbar-nav d-flex flex-row justify-content-end mx-0 col-8">
-              <li className= "nav-item active mx-2">
-                <a href="/" className= "nav-link">Dashboard</a>
+          <ul className="navbar-nav d-flex flex-row justify-content-end mx-0">
+              <li className= "nav-item active mr-2">
+                <a href="/" className= "nav-link" style={navLink}>Dashboard</a>
               </li>
               {(this.props.isLoggedIn)
                 ? <li className= "nav-item active mx-2">
                     <a href="#home"
                        onClick= {this.logoutUser}
-                       className= "nav-link">Logout</a>
+                       className= "nav-link" style={navLink}>Logout</a>
                   </li>
                 : <div className="d-flex">
                     <li className= "nav-item active mx-2">
                       <a href="/admin/login"
-                         className= "nav-link">Login</a>
+                         className= "nav-link" style={navLink}>Login</a>
                     </li>
-                    <li className= "nav-item active mx-2">
+                    <li className= "nav-item active ml-2">
                       <a href="/admin/signup"
-                         className= "nav-link">Sign Up</a>
+                         className= "nav-link" style={navLink}>Sign Up</a>
                     </li>
                   </div>
               }
@@ -96,8 +99,8 @@ class App extends Component {
 
         <Router>
           <Switch>
-              <Route exact path="/" render={()=><Tracker metrics={metrics} isLoggedIn={this.state.isLoggedIn}/>} />
-              <Route path="/admin/signup" render={()=><AdminSignUpPage/>}/>
+              <Route exact path="/" render={()=><Tracker metrics={metrics} isLoggedIn={this.state.isLoggedIn}/>}/>
+              <Route path="/admin/signup" render={()=><AdminSignUpPage/>} />
               <Route path="/admin/signupSuccess" render={()=><AdminSignUpSuccess/>}/>
               <Route path="/admin/login" render={()=><LoginPage/>}/>
               <Route path="/admin/metrics" render={()=><AdminMetricsPage metrics={metrics}/>}/>
@@ -105,6 +108,8 @@ class App extends Component {
               <Route path="*" component={NotFound} />
           </Switch>
         </Router>
+
+        <Footer/>
       </div>
     )
   }

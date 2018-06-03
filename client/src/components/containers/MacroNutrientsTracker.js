@@ -30,26 +30,28 @@ class MacroNutrientsTracker extends Component {
             </button>
           </div>
           {(listIsShowing)
-            ?<div className="card">
-              <div className="card-body">
-                {macronutrients.map((macronutrient) =>
-                  <p key={macronutrient.name}>
-                    {macronutrient.name}
-                    &nbsp;
-                    Total:
-                    &nbsp;
-                    {Math.round(dietTotals[macronutrient.name].dietAmount)}g
-                    &nbsp;
-                    {Math.round(
-                      [(dietTotals[macronutrient.name].dietAmount)*
-                      (macronutrient.calPerGram)/
-                      dietTotals.calorie.dietAmount]*
-                      100)
-                    }% of total calories
-                  </p>
-                )}
-               </div>
-             </div>
+            ?<div>
+              {macronutrients.map((macronutrient) =>
+                <div key={macronutrient.name} className= "card my-2">
+                  <div className = "card-body">
+                    <p className ="card-title font-weight-bold">{macronutrient.name}</p>
+                    <p className="card-text">
+                      Total:
+                      &nbsp;
+                      {Math.round(dietTotals[macronutrient.name].dietAmount)}g
+                    </p>
+                    <p>
+                      {Math.round(
+                        [(dietTotals[macronutrient.name].dietAmount)*
+                        (macronutrient.calPerGram)/
+                        dietTotals.calorie.dietAmount]*
+                        100)
+                      }% of total calories
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
             :null
           }
         </div>

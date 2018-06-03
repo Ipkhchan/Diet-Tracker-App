@@ -17,9 +17,9 @@ class RDISetSelector extends Component {
           :<form className= "userRDIForm card" onSubmit={this.props.getRDISet}>
              <div className= "card-body">
                <p className= "card-title font-weight-bold">Enter your gender and age below:</p>
-               <div className= "row mx-0">
-                 <p className= "card-text col-2 px-0">Gender :</p>
-                 <div className = "col-6">
+               <div className= "row mx-0 my-2">
+                 <p className= "card-text col-6 col-sm-2 p-0 vcenter">Gender :</p>
+                 <div className = "col-6 px-0">
                    <div className="form-check form-check-inline">
                      <input className= "form-check-input" type="radio" id="male" name="gender" value="male"/>
                      <label className= "form-check-label" htmlFor="male">male</label>
@@ -30,8 +30,8 @@ class RDISetSelector extends Component {
                    </div>
                  </div>
                </div>
-               <div className="form-group row mx-0">
-                 <label className= "col-2 px-0" htmlFor= "age">Age :</label>
+               <div className="form-group row mx-0 my-2">
+                 <label className= "col-6 col-sm-2 p-0 vcenter" htmlFor= "age">Age :</label>
                  <input className= "form-control col-2" type="number" name="age" id="age"/>
                </div>
                <input className= "my-3 btn btn-primary float-right" type="submit" value="enter"/>

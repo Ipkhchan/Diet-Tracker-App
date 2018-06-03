@@ -39,7 +39,7 @@ class AdminSignUpPage extends Component {
     const errors = this.state.errors;
 
     return (
-      <form className="signupForm my-3 mx-3">
+      <form className="signupForm px-2 px-sm-5">
         <h4>Enter Your Information Below</h4>
         <div>
           {(errors.length)
@@ -68,7 +68,9 @@ class AdminSignUpPage extends Component {
           <label htmlFor= "age">Age:</label>
           <input type="number" name="age" id="age" className="form-control"/>
         </div>
-        <input type="submit" value="submit" onClick={this.handleSubmit} className="btn btn-primary my-3 float-right"></input>
+        <div className= "d-flex justify-content-end">
+          <input type="submit" value="submit" onClick={this.handleSubmit} className="btn btn-primary my-3"></input>
+        </div>
       </form>
     )
   }

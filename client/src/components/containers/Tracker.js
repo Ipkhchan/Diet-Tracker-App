@@ -18,6 +18,7 @@ import MicroNutrientsTracker from './MicroNutrientsTracker'
 import FattyAcidTracker from './FattyAcidTracker'
 import MacroNutrientsTracker from './MacroNutrientsTracker'
 import DietNamePopup from '../common/DietNamePopup'
+import Alert from "../common/Alert"
 
 class Tracker extends Component {
   constructor(props) {
@@ -35,6 +36,8 @@ class Tracker extends Component {
     this.handleDietSave = this.handleDietSave.bind(this);
     this.dietSelect = this.dietSelect.bind(this);
     this.toggleShowRDISetForm = this.toggleShowRDISetForm.bind(this);
+    this.toggleShowDietNamePopup = this.toggleShowDietNamePopup.bind(this);
+    this.clearAlertMessage = this.clearAlertMessage.bind(this);
     // this.toggleDeficiencyList = this.toggleDeficiencyList.bind(this);
     // this.handleNutritiousFoodSearch = this.handleNutritiousFoodSearch.bind(this);
     this.state = {nutritionData: {},
@@ -44,7 +47,8 @@ class Tracker extends Component {
                   currentDietName: null,
                   metrics:{},
                   showDietNamePopup: false,
-                  showRDISetForm: false
+                  showRDISetForm: false,
+                  alertMessage: null,
                   // deficiencyListIsShowing:false
                 };
   }
@@ -193,8 +197,8 @@ class Tracker extends Component {
       processData: 'false',
       data: data
     }).then((res) => {
-      this.setState({dietNames: res.dietNames});
-      alert(res.message);
+      this.setState({dietNames: res.dietNames, alertMessage: res.message});
+      setTimeout(this.clearAlertMessage, 1000);
     });
   }
 
@@ -207,8 +211,8 @@ class Tracker extends Component {
       method:'GET',
       dataType:'JSON',
     }).then((res) => {
-      this.setState({dietNames: res.dietNames});
-      alert(res.message);
+      this.setState({dietNames: res.dietNames, alertMessage: res.message});
+      setTimeout(this.clearAlertMessage, 1000);
     });
   }
 
@@ -233,6 +237,10 @@ class Tracker extends Component {
     const dietName = document.querySelector("#dietName").value;
     this.setState({showDietNamePopup: false});
     this.saveDietData(dietName);
+  }
+
+  toggleShowDietNamePopup() {
+    this.setState({showDietNamePopup: !this.state.showDietNamePopup});
   }
 
   //TODO: nutritionData and dietTracker.nutrientTracker are duplicates of the
@@ -358,12 +366,23 @@ class Tracker extends Component {
   }
 
   toggleShowRDISetForm() {
-    this.setState({showRDISetForm: !this.state.showRDISetForm})
+    this.setState({showRDISetForm: !this.state.showRDISetForm});
+  }
+
+  clearAlertMessage() {
+    this.setState({alertMessage: null});
   }
 
   render() {
+    console.log("alertMessage", this.state.alertMessage);
+
     return (
-      <div className="px-5">
+      <div className="px-2 px-sm-5">
+        {(this.state.alertMessage)
+          ?<Alert alertMessage={this.state.alertMessage}
+                  clearAlertMessage={this.clearAlertMessage}/>
+          :null
+        }
         <SearchBar className="searchBar" handleSearch={this.handleSearch}/>
         <ResultsList searchResults={this.state.searchResults || []}
                      handleSelectItem={this.handleSelectItem}
@@ -403,7 +422,7 @@ class Tracker extends Component {
                       </button>
                       <button onClick= {this.promptDietName}
                               className = "btn-sm btn-primary mx-3">
-                        Save as New
+                        Save As
                       </button>
                       <button onClick= {this.deleteDietData}
                               className = "btn-sm btn-primary">
@@ -415,7 +434,8 @@ class Tracker extends Component {
                 </div>
               </div>
                 {(this.state.showDietNamePopup)
-                  ? <DietNamePopup submitDietName = {this.submitDietName}/>
+                  ? <DietNamePopup submitDietName = {this.submitDietName}
+                                   toggleShowDietNamePopup= {this.toggleShowDietNamePopup}/>
                   : null
                 }
                 <div className="card my-3">

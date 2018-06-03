@@ -31,10 +31,10 @@ class FoodRecommendationsList extends Component {
           <div className="list-group">
             {foodRecommendations.slice(foodSubListIndexStart,foodSubListIndexStart + 5)
                                 .map(foodRecommendation =>
-              <div className= "list-group-item" key={foodRecommendation.name}>
-                <div className="d-flex justify-content-between my-3">
-                  <p className="my-0">{foodRecommendation.name}</p>
-                  <p className="my-0">{foodRecommendation[metric] +" per 100g"}</p>
+              <div className= "list-group-item p-0" key={foodRecommendation.name}>
+                <div className="row justify-content-between my-3 mx-1">
+                  <p className="my-0 col-12 col-md-6">{foodRecommendation.name}</p>
+                  <p className="my-0 col-12 col-md-6 text-md-right">{foodRecommendation[metric] +" per 100g"}</p>
                 </div>
                 <div>
                   {(isDeficient)
@@ -47,8 +47,8 @@ class FoodRecommendationsList extends Component {
             )}
           </div>
           <div className="my-3 d-flex justify-content-end">
-            <button onClick = {this.handleListDisplay} className= "btn-sm btn-primary">Prev</button>
-            <button onClick = {this.handleListDisplay} className= "btn-sm btn-primary mx-3">Next</button>
+            <button onClick = {this.handleListDisplay} className= "btn-sm btn-primary mx-3">Prev</button>
+            <button onClick = {this.handleListDisplay} className= "btn-sm btn-primary">Next</button>
           </div>
         </div>
       </div>

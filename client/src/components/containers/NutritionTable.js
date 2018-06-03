@@ -17,16 +17,18 @@ class NutritionTable extends Component {
     //     break;
     // }
     return (
-      <table className="table itemTable">
-        <NutritionTableHeaders className="itemTableHeaders"  headers={this.state.headers}/>
-        <NutritionTableRows className="itemTableRows" nutritionData={nutritionData}
-                                                      headers={this.state.headers}
-                                                      dietTotals = {dietTotals}
-        />
-        <MetricsFooter headers={this.state.headers}
-                       metrics = {this.props.metrics}
-        />
-      </table>
+      <div className = "table-responsive">
+        <table className="table itemTable">
+          <NutritionTableHeaders className="itemTableHeaders"  headers={this.state.headers}/>
+          <NutritionTableRows className="itemTableRows" nutritionData={nutritionData}
+                                                        headers={this.state.headers}
+                                                        dietTotals = {dietTotals}
+          />
+          <MetricsFooter headers={this.state.headers}
+                         metrics = {this.props.metrics}
+          />
+        </table>
+      </div>
     )
   }
 };

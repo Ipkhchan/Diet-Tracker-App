@@ -18,7 +18,7 @@ class MicroNutrientsTracker extends Component {
     const listIsShowing = this.state.listIsShowing;
 
     return (
-      <div className="card">
+      <div className="card mb-4">
         <div className="card-body">
           <div className= "flex-space-between">
             <p className="vcenter">MICRONUTRIENTS</p>
