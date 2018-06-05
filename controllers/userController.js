@@ -32,10 +32,17 @@ module.exports.save_fooditem_data = function(req, res, next) {
 
   user.save(function(err) {
     if(err) {next(err);}
+    UserCollection.find({'diets.name': sentDiet.name}, {'diets.$': 1}, function(err, diet) {
+      if(err) {next(err);}
+      res.json({"message": "Saved!",
+                "nutritionData": diet[0].diets[0],
+                "dietNames": getDietNames(user)});
+    })
+    // console.log("saved Diet", diet);
     // const dietNames = getDietNames(user);
     // const dietNames = user.diets.map((diet) => {return {"name": diet.name, "_id": diet._id}});
-    console.log("coolio");
-    res.json({"message": "Saved!", "dietNames": getDietNames(user)});
+    // console.log("coolio");
+
   });
   //   //TODO: understand how errors work. does return next(err) skip to the next
   //   //middleware without running the rest of the code? I'm concerned that

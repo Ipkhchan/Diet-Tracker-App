@@ -14,7 +14,7 @@ const Alert = (props) => {
          style={AlertStyle}>
       <p className= "mr-3 vcenter">{props.alertMessage}</p>
       <button className= "btn btn-sm btn-outline-dark vcenter"
-              onClick= {props.clearAlertMessage}>X</button>
+              onClick= {props.handleAlertMessage}>X</button>
     </div>
   )
 }

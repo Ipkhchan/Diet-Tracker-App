@@ -31,14 +31,14 @@ dietTracker.getItem = function(itemName) {
     }
   })
   .then(function(res) {
-    dietTracker.searchResults = res.common.map(item => item.food_name).slice(0,5);
-    console.log(dietTracker.searchResults);
+    //return the first 5 search results.
+    return res.common.map(item => item.food_name).slice(0,5);
   })
 };
 
 dietTracker.getNutrients = function(itemName) {
   //make AJAX POST request to get nutritional information
-  $.ajax({
+  return $.ajax({
     url: 'https://trackapi.nutritionix.com/v2/natural/nutrients',
     method:'POST',
     dataType:'JSON',
@@ -50,8 +50,7 @@ dietTracker.getNutrients = function(itemName) {
       query: itemName
     }
   }).then(function(res) {
-    console.log(res);
-    dietTracker.addNutrientInfo(res);
+    return dietTracker.addNutrientInfo(res);
   });
 };
 
@@ -257,8 +256,9 @@ dietTracker.addNutrientInfo = function(nutrientInfo) {
     });
   });
 
-  dietTracker.nutrientTracker.push(foodData);
-  console.log(dietTracker.nutrientTracker);
+  return foodData;
+  // dietTracker.nutrientTracker.push(foodData);
+  // console.log(dietTracker.nutrientTracker);
 };
 
 export default dietTracker;

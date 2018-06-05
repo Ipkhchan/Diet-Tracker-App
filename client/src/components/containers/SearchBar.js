@@ -10,7 +10,7 @@ class SearchBar extends Component {
                 this.props.handleSearch();
               }}>
           <input placeholder="Search Food Item" className="form-control search mr-sm-2"/>
-          <input type="submit" value="Search" className="btn-sm btn-outline-success mt-3"/>
+          <input type="submit" value="Search" className="btn-sm btn-outline-success my-3"/>
         </form>
       )
 
