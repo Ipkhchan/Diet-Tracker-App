@@ -310,7 +310,9 @@ class Tracker extends Component {
     e.preventDefault();
     Promise.resolve(this.getRDISet(e))
       .then((rdiSet)=> {
-        this.setState({metrics: rdiSet, showRDISetForm: false});
+        this.setState({metrics: rdiSet,
+                       showRDISetForm: false,
+                       dietTotals: this.sumDietTotals(undefined, rdiSet)});
       })
       .catch((err)=> {
         console.log(err);
