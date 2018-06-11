@@ -1,10 +1,3 @@
-//TODO: tailor the save popup to the case. If current DietName exists, then ask
-// if user wants to save that dietname. If not, then prompt the user for a dietName.
-//tweak save function to allow for both options above.
-//TODO: header should be fixed positioning (always visible);
-//TODO: user should be able to get food suggestions even when logged out.
-//TODO: keep diet name and items packaged together
-
 import React, { Component } from 'react';
 import {connect} from 'react-redux';
 import $ from 'jquery';
@@ -19,6 +12,7 @@ import FattyAcidTracker from './FattyAcidTracker'
 import MacroNutrientsTracker from './MacroNutrientsTracker'
 import DietNamePopup from '../common/DietNamePopup'
 import Alert from "../common/Alert"
+import speechRecognition from "../../speechRecognition"
 
 class Tracker extends Component {
   constructor(props) {
@@ -26,6 +20,9 @@ class Tracker extends Component {
     this.handleNutritionDataChange = this.handleNutritionDataChange.bind(this);
     this.handleSearch = this.handleSearch.bind(this);
     this.handleSelectItem = this.handleSelectItem.bind(this);
+    this.handleGetRDISet = this.handleGetRDISet.bind(this);
+    this.handleCreateNewDiet = this.handleCreateNewDiet.bind(this);
+    this.handleSearchItemNatural = this.handleSearchItemNatural.bind(this);
     this.saveDietData = this.saveDietData.bind(this);
     this.deleteDietData = this.deleteDietData.bind(this);
     this.sumDietTotals = this.sumDietTotals.bind(this);
@@ -38,6 +35,8 @@ class Tracker extends Component {
     this.toggleShowDietNamePopup = this.toggleShowDietNamePopup.bind(this);
     this.handleAlertMessage = this.handleAlertMessage.bind(this);
     this.getUserDiets = this.getUserDiets.bind(this);
+    this.handleVoiceSearch = this.handleVoiceSearch.bind(this);
+    this.alertMessage = this.alertMessage.bind(this);
     // this.toggleDeficiencyList = this.toggleDeficiencyList.bind(this);
     // this.handleNutritiousFoodSearch = this.handleNutritiousFoodSearch.bind(this);
     this.state = {nutritionData: {"items":[], "name": null},
@@ -52,25 +51,31 @@ class Tracker extends Component {
                 };
   }
 
-  //TODO: micronutrient units some don't match up. might have to adjust schema to include units
   componentDidUpdate() {
-    console.log(this.state.nutritionData);
+              console.log("metrics", this.state.metrics);
   }
+  //TODO: micronutrient units some don't match up. might have to adjust schema to include units
   //TODO: use generators to yield promise control to componentDidMount.
   //reorganize code in componentDidMount so code is easy to follow here.
   //TODO: don't split up dietName and foodItems. Keep them together, then you don't
   //have to keep  track of currentDietName. This prevents mismatch anomalies and
   //makes the app more robust. will require refactoring props and variables passed around.
   componentDidMount() {
+    document.querySelector('#search').focus();
+
     Promise.all([this.getUserDiets(),this.getRDISet()])
       .then(([userDiet, rdiSet]) => {
-        this.setState({nutritionData: userDiet.defaultDiet,
-                       dietTotals: this.sumDietTotals(userDiet.defaultDiet.items, rdiSet),
-                       dietNames: userDiet.dietNames,
-                       showRDISetForm: false,
-                       metrics: rdiSet
-                      });
-        console.log("nutritionData", this.state.nutritionData);
+        if (userDiet.dietNames.length) {
+          this.setState({nutritionData: userDiet.defaultDiet,
+                         dietTotals: this.sumDietTotals(userDiet.defaultDiet.items, rdiSet),
+                         dietNames: userDiet.dietNames,
+                         showRDISetForm: false,
+                         metrics: rdiSet
+                        });
+        }
+        else {
+          this.setState({metrics: rdiSet});
+        }
       })
       .catch(function(error) {
       console.log("Error", error);
@@ -94,17 +99,15 @@ class Tracker extends Component {
   //use this ajax call
    getRDISet(e) {
      let path;
-     console.log("path initial value", path);
      if (localStorage.getItem('token')) {
        path = "/users/metrics/";
      }
      // let sex = {value: "default"};
      // let age = {value: "default"};
      if(e) {
-       e.preventDefault();
+       // e.preventDefault();
        const [sex, age] = $('.userRDIForm').serializeArray();
        path = '/metrics/' + sex.value + '/' + age.value;
-       console.log("typeOf Path", typeof path);
      }
 
      //if user is not logged in and a specific RDI sex/age range has not between
@@ -112,7 +115,6 @@ class Tracker extends Component {
      else if(path === undefined) {
        path = "/metrics/default/default";
      }
-     console.log("path", path);
 
      return $.ajax({
        url: path,
@@ -167,7 +169,7 @@ class Tracker extends Component {
 
 
     nutritionItems.forEach((food) => {
-      if(foodItem == food.name) {
+      if(foodItem === food.name) {
         itemData = food;
         foodItemIndex = nutritionItems.indexOf(itemData);
       }
@@ -220,18 +222,64 @@ class Tracker extends Component {
     document.querySelector(".search").value = "";
   }
 
-  handleSelectItem(e) {
-    const foodName = e.target.textContent
-    Promise.resolve(dietTracker.getNutrients(foodName))
+  handleSearchItemNatural(items = document.querySelector(".search").value) {
+    Promise.resolve(dietTracker.getNutrients(items))
       .then((foodData) => {
+        console.log("foodData", foodData);
+        const existingFoodItemList = this.state.nutritionData.items.map((foodItem) => foodItem.name);
+        console.log("existingFoodItemList", existingFoodItemList);
+        let clashingFoodItemList = [];
+        // const newFoodItemList = foodData.map((foodItem) => foodItem.name);
+        foodData = foodData.filter((foodItem) => {
+          if (existingFoodItemList.indexOf(foodItem.name) > -1) {
+            clashingFoodItemList.push(foodItem.name);
+            return false;
+          }
+          return true;
+        })
+
+        let alertMessage = null;
+
+        if (foodData.length && !clashingFoodItemList.length) {
+          alertMessage = "Added!";
+        }
+        else if (!foodData.length && clashingFoodItemList.length) {
+          alertMessage = "Items are already in your diet!"
+        }
+        else if (foodData.length && clashingFoodItemList.length) {
+          alertMessage = "Some items added! Others already exist in your diet!"
+        }
+
         let newNutritionData = Object.assign({}, this.state.nutritionData);
-        newNutritionData.items.push(foodData);
+        newNutritionData.items = newNutritionData.items.concat(foodData);
         this.setState({nutritionData: newNutritionData,
-                       dietTotals: this.sumDietTotals(newNutritionData.items)})
+                       dietTotals: this.sumDietTotals(newNutritionData.items),
+                       alertMessage: this.handleAlertMessage(alertMessage)})
       })
-      .catch(function(error) {
-        console.log(error);
+      .catch((error) => {
+        this.setState({alertMessage: this.handleAlertMessage(error.responseJSON.message)})
       })
+    document.querySelector(".search").value = "";
+  }
+
+  handleSelectItem(e) {
+    const foodName = e.target.textContent;
+    const foodItemList = this.state.nutritionData.items.map((foodItem) => foodItem.name);
+    if (foodItemList.indexOf(foodName) > -1) {
+      this.setState({alertMessage: this.handleAlertMessage("This food is already in your diet!")});
+    }
+    else {
+      Promise.resolve(dietTracker.getNutrients(foodName))
+        .then((foodData) => {
+          let newNutritionData = Object.assign({}, this.state.nutritionData);
+          newNutritionData.items = newNutritionData.items.concat(foodData);
+          this.setState({nutritionData: newNutritionData,
+                         dietTotals: this.sumDietTotals(newNutritionData.items)})
+        })
+        .catch(function(error) {
+          console.log(error);
+        })
+    }
     // setTimeout(function() {
     //   const dietTotals = this.sumDietTotals(dietTracker.nutrientTracker);
     //   this.setState({nutritionData: {"name": this.state.nutritionData.name || null,
@@ -241,6 +289,34 @@ class Tracker extends Component {
     // }.bind(this), 1000);
 
   }
+
+  handleVoiceSearch(done) {
+    const recordButton = document.querySelector('#recordButton');
+
+    speechRecognition.listen()
+      .then(transcript => {
+        this.handleSearchItemNatural(transcript);
+      })
+      .then(() => {
+        done();
+      })
+      .catch(error => {
+        console.log(error);
+      })
+  }
+
+  handleGetRDISet(e) {
+    e.preventDefault();
+    Promise.resolve(this.getRDISet(e))
+      .then((rdiSet)=> {
+        this.setState({metrics: rdiSet, showRDISetForm: false});
+      })
+      .catch((err)=> {
+        console.log(err);
+      })
+  }
+
+
 
   handleDietSelect(e) {
     e.preventDefault();
@@ -264,6 +340,10 @@ class Tracker extends Component {
 
   }
 
+  handleCreateNewDiet() {
+    this.setState({showDietNamePopup: true});
+  }
+
 // ************************************END OF USER INPUT HANDLERS*******************
 
 // *********************************START OF CRUD METHODS**************************
@@ -280,9 +360,15 @@ class Tracker extends Component {
       data = {"name": dietName, "items": this.state.nutritionData.items};
     }
     //otherwise, just send our updated existing diet for saving.
-    else {
+    else if (this.state.nutritionData.items.length) {
       data = this.state.nutritionData;
     }
+
+    else {
+      this.setState({alertMessage: this.handleAlertMessage("No items to Save!")});
+      return;
+    }
+
     console.log("saveDietData//data", data);
     $.ajax({
       url: '/users/save',
@@ -315,7 +401,7 @@ class Tracker extends Component {
       this.saveDietData(null);
     }
     else {
-      this.promptDietName;
+      this.promptDietName();
     }
   }
 
@@ -349,22 +435,27 @@ class Tracker extends Component {
     this.setState({showRDISetForm: !this.state.showRDISetForm});
   }
 
-  handleAlertMessage(alertMessage) {
+  handleAlertMessage(alertMessage, displayTime = 1000) {
     //if no alertMessage is passed, that means there should be no alert message shown
     if (!alertMessage) {
       this.setState({alertMessage: null})
     }
     //else set a timeout for the alert message to fade in 1 second.
     else {
-      setTimeout(() => {this.setState({alertMessage: null})}, 1000);
+      setTimeout(() => {this.setState({alertMessage: null})}, displayTime);
       return alertMessage;
     }
   }
 
+  alertMessage(alertMessage, displayTime = 1000) {
+    this.setState({alertMessage: this.handleAlertMessage(alertMessage, displayTime)});
+  }
+
+
+
 // ***********************************END OF UI STATE METHODS*********************
 
   render() {
-    console.log("this.state.nutritionData.name", this.state.nutritionData.name);
 
     return (
       <div className="px-2 px-sm-5">
@@ -373,32 +464,41 @@ class Tracker extends Component {
                   handleAlertMessage={this.handleAlertMessage}/>
           :null
         }
-        <SearchBar className="searchBar" handleSearch={this.handleSearch}/>
+        <div className="jumbotron py-3">
+          <p>{`Welcome to healthy bodies! Get started by entering in food items from
+             your diet below or click the record button to input by voice. We'll
+             gather all the information for you.`}</p>
+        </div>
+        <SearchBar className="searchBar" handleSearch={this.handleSearchItemNatural}
+                                         handleVoiceSearch={this.handleVoiceSearch}/>
         <ResultsList searchResults={this.state.searchResults || []}
                      handleSelectItem={this.handleSelectItem}
         />
         <RDISetSelector metrics = {this.state.metrics || {}}
                         toggleShowRDISetForm= {this.toggleShowRDISetForm}
                         showRDISetForm= {this.state.showRDISetForm}
-                        getRDISet= {this.getRDISet}/>
-
-        {(this.state.dietNames.length)
-          ? <form className="card my-3" onChange={this.handleDietSelect} onSubmit={this.handleDietSelect}>
-              <div className="card-body">
-                <p className= "font-weight-bold">Select your Diet:</p>
-                <select className="dietSelector form-control">
-                  {this.state.dietNames.map((dietName) =>
-                    <option key={dietName._id} value={dietName._id} selected>{dietName.name}</option>
-                  )}
-                </select>
-                <input type="submit" value="enter" className="btn-sm btn-primary my-3 float-right"/>
-              </div>
-            </form>
-          : null
-        }
-        {(this.state.nutritionData.items)
-          ? <div>
-              <div className= "card">
+                        handleGetRDISet= {this.handleGetRDISet}/>
+        {(this.state.nutritionData.items.length)
+          ?<div>
+            {(this.state.dietNames.length)
+              ? <form className="card my-3" onChange={this.handleDietSelect} onSubmit={this.handleDietSelect}>
+                  <div className="card-body">
+                    <p className= "font-weight-bold">Select your Diet:</p>
+                    <select className="dietSelector form-control">
+                      {this.state.dietNames.map((dietName) =>
+                        <option key={dietName._id} value={dietName._id} selected>{dietName.name}</option>
+                      )}
+                    </select>
+                    <div className= "d-flex justify-content-end">
+                      <button onClick = {this.handleCreateNewDiet} className = "btn-sm btn-primary mx-3 my-3">Create New</button>
+                      <input type="submit" value="enter" className="btn-sm btn-primary my-3"/>
+                    </div>
+                  </div>
+                </form>
+              : null
+            }
+            <div>
+              <div className= "card my-3">
                 <div className = "card-body">
                   <SelectedItemsList className="selectedItemsList"
                                      nutritionData={this.state.nutritionData.items}
@@ -419,7 +519,7 @@ class Tracker extends Component {
                         Delete
                       </button>
                      </div>
-                    :<p>Log In or Sign Up to save your diet!</p>
+                    :<p className= "mt-2">Log In or Sign Up to save your diet!</p>
                   }
                 </div>
               </div>
@@ -440,12 +540,15 @@ class Tracker extends Component {
                 <FattyAcidTracker nutritionData={this.state.nutritionData.items}/>
                 <MacroNutrientsTracker dietTotals={this.state.dietTotals}/>
                 <MicroNutrientsTracker nutritionData={this.state.nutritionData.items}
-                                      dietTotals={this.state.dietTotals}
+                                       dietTotals={this.state.dietTotals}
+                                       metrics={this.state.metrics}
+                                       alertMessage = {this.alertMessage}
+
                 />
             </div>
+          </div>
           : null
         }
-
       </div>
     )
   };

@@ -36,6 +36,26 @@ dietTracker.getItem = function(itemName) {
   })
 };
 
+// dietTracker.getItemNatural = function(itemName) {
+//   return $.ajax({
+//     url: 'https://trackapi.nutritionix.com/v2/natural/nutrients',
+//     method:'GET',
+//     dataType:'JSON',
+//     headers: {
+//       "x-app-id": dietTracker.Id,
+//       "x-app-key": dietTracker.key
+//     },
+//     data: {
+//       query: itemName,
+//       branded: "false",
+//     }
+//   })
+//   .then(function(res) {
+//     //return the first 5 search results.
+//     return res;
+//   })
+// };
+
 dietTracker.getNutrients = function(itemName) {
   //make AJAX POST request to get nutritional information
   return $.ajax({
@@ -50,6 +70,7 @@ dietTracker.getNutrients = function(itemName) {
       query: itemName
     }
   }).then(function(res) {
+    // return res;
     return dietTracker.addNutrientInfo(res);
   });
 };
@@ -228,35 +249,31 @@ dietTracker.nutrientUnits = {"protein": "g",
 //Store/add nutrient info for a single food item to nutrientTracker object.
 //Requires 2 parameters (nutrientInfo (straight from Nutritionix API) and name of food item)
 //TODO: the algorithm for filtering this array could probably be improved. Can do in 1 step
-dietTracker.addNutrientInfo = function(nutrientInfo) {
-  nutrientInfo = nutrientInfo.foods[0];
-  const foodItem = nutrientInfo.food_name;
-  // dietTracker.nutrientTracker[foodItem]= {};
-  // dietTracker.nutrientTracker[foodItem].name = foodItem;
-  // //quantity is 1 by default
-  // dietTracker.nutrientTracker[foodItem].quantity = 1;
-  // dietTracker.nutrientTracker[foodItem].amount = nutrientInfo.serving_weight_grams;
+dietTracker.addNutrientInfo = function(searchResults) {
+  let foodDatas = [];
 
-  let foodData = {};
-  foodData.quantity = 1;
-  foodData.amount = nutrientInfo.serving_weight_grams;
-  foodData.name = foodItem;
+  for (let i = 0; i < searchResults.foods.length; i++) {
+    let nutrientInfo = searchResults.foods[i].full_nutrients.filter(nutrient => dietTracker.filterTrackedNutrients(nutrient));
 
-  nutrientInfo = nutrientInfo.full_nutrients.filter(nutrient => dietTracker.filterTrackedNutrients(nutrient));
+    let foodData = {};
+    foodData.quantity = 1;
+    foodData.amount = searchResults.foods[i].serving_weight_grams;
+    foodData.name = searchResults.foods[i].food_name;
 
-
-//populate the food item object nested within nutrientTracker with nutritional info
-//for that foor item
-  nutrientInfo.forEach(function(attribute) {
-    dietTracker.nutrientCodes.forEach(function(nutrientCode) {
-      if (attribute.attr_id === nutrientCode.code) {
-          // dietTracker.nutrientTracker[foodItem][nutrientCode.nutrient]= attribute.value;
-          foodData[nutrientCode.nutrient]= attribute.value;
-      }
+    //populate the food item object nested within nutrientTracker with nutritional info
+    //for that foor item
+    nutrientInfo.forEach(function(attribute) {
+      dietTracker.nutrientCodes.forEach(function(nutrientCode) {
+        if (attribute.attr_id === nutrientCode.code) {
+            // dietTracker.nutrientTracker[foodItem][nutrientCode.nutrient]= attribute.value;
+            foodData[nutrientCode.nutrient]= attribute.value;
+        }
+      });
     });
-  });
+    foodDatas.push(foodData);
+  }
 
-  return foodData;
+  return foodDatas;
   // dietTracker.nutrientTracker.push(foodData);
   // console.log(dietTracker.nutrientTracker);
 };

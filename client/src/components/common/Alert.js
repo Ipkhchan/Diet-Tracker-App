@@ -5,7 +5,7 @@ const AlertStyle = {
   "top": "90%",
   "left": "50%",
   "transform": "translate(-50%, -50%)",
-  "z-index": "10",
+  "zIndex": "10",
 }
 
 const Alert = (props) => {

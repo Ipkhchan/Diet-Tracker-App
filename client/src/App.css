@@ -6,7 +6,7 @@ html {
 [class *="row"] {
     display: flex;
     margin: auto;
-    margin: 0 10%;
+    /* margin: 0 10%; */
 }
 
 /*Clearfixes*/

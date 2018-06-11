@@ -5,7 +5,7 @@ module.exports.get_nutritiousfood_data = function(req, res, next) {
   console.log("indexController.get_nu");
   const deficiency = req.params.deficiency;
 
-  foodDataCollection.find({},{'_id': 0, 'name':1, [deficiency]: 1}).
+  foodDataCollection.find({},{'_id': 0, 'name':1, [deficiency]: 1, amount: 1}).
                      sort({[deficiency]:-1}).
                      limit(20).
                      exec(function(err,list) {

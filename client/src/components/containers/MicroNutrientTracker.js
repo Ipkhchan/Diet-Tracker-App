@@ -35,16 +35,14 @@ class MicroNutrientTracker extends Component {
     console.log(e.type);
     // clearTimeout(showBreakdown);
     if(e.type === "mouseover") {
-      setTimeout(function() {
-        this.setState({breakDownIsShowing: true});
-      }.bind(this), 100);
+      setTimeout(() =>
+        this.setState({breakDownIsShowing: true}), 100);
+    }
       // this.setState({breakDownIsShowing: true});
       // console.log("done");
-    }
     else if (e.type === "mouseleave") {
-      setTimeout(function() {
-        this.setState({breakDownIsShowing: false});
-      }.bind(this), 100);
+      setTimeout(() =>
+        this.setState({breakDownIsShowing: false}), 100);
       // if(showBreakdown) {
       //   clearTimeout(showBreakdown);
       //   showBreakdown = null;
@@ -63,8 +61,6 @@ class MicroNutrientTracker extends Component {
     const isDeficient = (dietTotals[dietTotal].dietAmount/dietTotals[dietTotal].rdi < 1)
                         ? true
                         : false;
-
-    console.log("MicroNutrientTracker", dietTracker.nutrientUnits);
 
     return (
       <div className= "card my-3">

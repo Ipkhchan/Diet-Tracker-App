@@ -9,7 +9,12 @@ class MicroNutrientsTracker extends Component {
   }
 
   toggleMicronutrientDisplay() {
-    (this.state.listIsShowing) ? this.setState({listIsShowing: false}) : this.setState({listIsShowing: true});
+    if (Object.keys(this.props.metrics).length) {
+      (this.state.listIsShowing) ? this.setState({listIsShowing: false}) : this.setState({listIsShowing: true});
+    }
+    else {
+      this.props.alertMessage('Enter your gender and age above to get your recommended daily intakes!', 3000);
+    }
   }
 
   render() {

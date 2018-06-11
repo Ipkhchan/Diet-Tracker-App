@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import dietTracker from '../../api.js'
 
 class FoodRecommendationsList extends Component {
   constructor(props) {
@@ -34,7 +35,7 @@ class FoodRecommendationsList extends Component {
               <div className= "list-group-item p-0" key={foodRecommendation.name}>
                 <div className="row justify-content-between my-3 mx-1">
                   <p className="my-0 col-12 col-md-6">{foodRecommendation.name}</p>
-                  <p className="my-0 col-12 col-md-6 text-md-right">{foodRecommendation[metric] +" per 100g"}</p>
+                  <p className="my-0 col-12 col-md-6 text-md-right">{Math.round(10*(foodRecommendation[metric]))/10} {dietTracker.nutrientUnits[metric]}  per  {foodRecommendation.amount} g</p>
                 </div>
                 <div>
                   {(isDeficient)

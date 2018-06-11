@@ -14,7 +14,7 @@ class RDISetSelector extends Component {
               <button className="btn-sm btn-primary" onClick={this.props.toggleShowRDISetForm}>Change RDI Set</button>
             </div>
            </div>
-          :<form className= "userRDIForm card" onSubmit={this.props.getRDISet}>
+          :<form className= "userRDIForm card" onSubmit={this.props.handleGetRDISet}>
              <div className= "card-body">
                <p className= "card-title font-weight-bold">Enter your gender and age below:</p>
                <div className= "row mx-0 my-2">
