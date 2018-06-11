@@ -291,18 +291,19 @@ class Tracker extends Component {
   }
 
   handleVoiceSearch(done) {
-    const recordButton = document.querySelector('#recordButton');
+      const recordButton = document.querySelector('#recordButton');
 
-    speechRecognition.listen()
-      .then(transcript => {
-        this.handleSearchItemNatural(transcript);
-      })
-      .then(() => {
-        done();
-      })
-      .catch(error => {
-        console.log(error);
-      })
+      speechRecognition.listen()
+        .then(transcript => {
+          this.handleSearchItemNatural(transcript);
+        })
+        .then(() => {
+          done();
+        })
+        .catch(error => {
+          console.log(error);
+          done();
+        })
   }
 
   handleGetRDISet(e) {
