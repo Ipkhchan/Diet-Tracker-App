@@ -1,22 +1,15 @@
-var userDailyDiet = require('../models/UserDailyDiet');
-var foodDataCollection = require('../models/foodDataCollection');
-var UserCollection = require('../models/User')
+var User = require('../models/User')
 const rdiCollection = require('../models/RDICollection');
 
 function getDietNames(user) {
-  console.log("here");
-  console.log("user", user);
   const dietNameList = user.diets.map((diet) => {return {"name": diet.name, "_id": diet._id}});
-  console.log("about to return");
   return dietNameList;
 }
 
 //TODO: check if food item already exists in database
 module.exports.save_fooditem_data = function(req, res, next) {
-
   const sentDiet = req.body;
   const user = req.user;
-  console.log("sentDiet");
 
   //if there's an id in the nutritionData, that means that this diet has been saved
   //before and is an existing diet.
@@ -28,32 +21,15 @@ module.exports.save_fooditem_data = function(req, res, next) {
     user.diets.push(sentDiet);
   }
 
-  // const dietNames = getDietNames(user);
-
   user.save(function(err) {
     if(err) {next(err);}
-    UserCollection.find({'diets.name': sentDiet.name}, {'diets.$': 1}, function(err, diet) {
+    User.find({'diets.name': sentDiet.name}, {'diets.$': 1}, function(err, diet) {
       if(err) {next(err);}
       res.json({"message": "Saved!",
                 "nutritionData": diet[0].diets[0],
                 "dietNames": getDietNames(user)});
     })
-    // console.log("saved Diet", diet);
-    // const dietNames = getDietNames(user);
-    // const dietNames = user.diets.map((diet) => {return {"name": diet.name, "_id": diet._id}});
-    // console.log("coolio");
-
   });
-  //   //TODO: understand how errors work. does return next(err) skip to the next
-  //   //middleware without running the rest of the code? I'm concerned that
-  //   //this middleware will send "Saved!", even if there's been an error.
-  // // does this async? If so, do i need to use promises to make sure the creation of Allow
-  // // the objects occurs
-  // //collect all foodItem names stored in database so we can avoid duplicating
-  // //existing items
-  // //TODO: this code could probably be refactored to be more efficient, better looking
-  // //and more robust
-
 };
 
 module.exports.delete_fooditem_data = function(req, res, next) {
@@ -76,8 +52,6 @@ module.exports.get_fooditem_data = function(req, res, next) {
     res.json(diet);
   //otherwise, send along the first diet stored and a list of all diet names stored
   } else {
-    // const dietNames = getDietNames(req.user);
-    // const dietNames = req.user.diets.map((diet) => {return {"name": diet.name, "_id": diet._id}});
     res.json({"defaultDiet": req.user.diets[0], "dietNames": getDietNames(req.user)})
   }
 };
@@ -98,38 +72,4 @@ module.exports.get_RDISet = function(req, res, next) {
      if(err) {next(err);}
      res.json(RDISet);
    });
-
-  // let sex = req.params.sex;
-  // let age = req.params.age;
-  //
-  // function getRDISet(sex, age) {
-  //   rdiCollection.
-  //     findOne({
-  //       sex: sex,
-  //       "age_min": {$lte: age},
-  //       "age_max": {$gte: age}}).
-  //     exec(function(err,RDISet) {
-  //      if(err) {next(err);}
-  //      res.json(RDISet);
-  //    });
-  // }
-  //
-  // if (sex && age) {
-  //   if(sex === "default" && age === "default") {
-  //     rdiCollection.findOne(function(err, RDISet) {
-  //       if (err) {next(err);}
-  //       // console.log(RDISet);
-  //       res.json(RDISet);
-  //     });
-  //   }
-  //   else {
-  //     getRDISet(sex, age);
-  //   }
-  // }
-  // else {
-  //   const user = req.user;
-  //   getRDISet(user.sex, user.age);
-  //
-  // }
-  // //if
 };

@@ -7,8 +7,6 @@ import dietTracker from '../../api.js'
 class MicroNutrientTracker extends Component {
   constructor(props) {
     super(props)
-    this.toggleFoodList = this.toggleFoodList.bind(this);
-    this.handleBreakDownDisplay = this.handleBreakDownDisplay.bind(this);
     this.state = {listIsShowing: false,
                   breakDownIsShowing: false,
                   foodRecommendations: []
@@ -16,7 +14,7 @@ class MicroNutrientTracker extends Component {
   }
 
   componentDidMount() {
-  // handleNutritiousFoodSearch() {
+    //get food recommendations
     $.ajax({
       url: this.props.dietTotal,
       headers: {'Authorization': `bearer ${localStorage.getItem('token')}`},
@@ -27,27 +25,19 @@ class MicroNutrientTracker extends Component {
     });
   }
 
-  toggleFoodList() {
+  toggleFoodList = () => {
     (this.state.listIsShowing) ? this.setState({listIsShowing: false}) : this.setState({listIsShowing: true});
   }
 
-  handleBreakDownDisplay(e) {
+  handleBreakDownDisplay = (e) => {
     console.log(e.type);
-    // clearTimeout(showBreakdown);
     if(e.type === "mouseover") {
       setTimeout(() =>
         this.setState({breakDownIsShowing: true}), 100);
     }
-      // this.setState({breakDownIsShowing: true});
-      // console.log("done");
     else if (e.type === "mouseleave") {
       setTimeout(() =>
         this.setState({breakDownIsShowing: false}), 100);
-      // if(showBreakdown) {
-      //   clearTimeout(showBreakdown);
-      //   showBreakdown = null;
-      // }
-      // this.setState({breakDownIsShowing: false});
     }
   }
 
@@ -81,15 +71,15 @@ class MicroNutrientTracker extends Component {
               </button>
             </div>
           </div>
-          <div className="progress my-3">
+          <div className="progress my-3"
+               onMouseOver = {this.handleBreakDownDisplay}
+               onMouseLeave = {this.handleBreakDownDisplay}>
             <div className= "progress-bar"
                  style= {{height: "100%",
                           width: `${(isDeficient)
                                     ? ((dietTotals[dietTotal].dietAmount/dietTotals[dietTotal].rdi)*100)
                                     : 100}%`,
-                          background: "green"}}
-                  onMouseOver = {this.handleBreakDownDisplay}
-                  onMouseLeave = {this.handleBreakDownDisplay}/>
+                          background: "green"}}/>
           </div>
           {(listIsShowing)
           ?<FoodRecommendationsList foodRecommendations= {foodRecommendations}

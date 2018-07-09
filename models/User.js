@@ -93,14 +93,6 @@ var UserSchema = new Schema({
   }]
 })
 
-
-
-
-
-
-
-
-
 var User = module.exports = mongoose.model('User', UserSchema);
 
 module.exports.createUser = function(newUser, callback) {
@@ -111,11 +103,8 @@ module.exports.createUser = function(newUser, callback) {
 }
 
 module.exports.comparePassword = function(inputPassword, hash, callback) {
-  console.log("inputPassword", inputPassword);
-  console.log("hash", hash);
   bcrypt.compare(inputPassword, hash, function(err, isMatch) {
     if(err) {next(err);}
-    console.log("isMatch", isMatch);
     callback(null, isMatch);
   })
 }

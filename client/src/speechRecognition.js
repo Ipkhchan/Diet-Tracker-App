@@ -5,7 +5,6 @@ const speechRecognition = (function() {
     const recognition = new window.SpeechRecognition();
     recognition.interimResults = false;
     recognition.continuous = false;
-    console.log(recognition);
 
     return {listen: function() {
                       return new Promise(function(resolve, reject) {

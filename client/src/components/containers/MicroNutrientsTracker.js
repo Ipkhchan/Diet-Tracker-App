@@ -4,11 +4,10 @@ import MicroNutrientTracker from "./MicroNutrientTracker"
 class MicroNutrientsTracker extends Component {
   constructor(props) {
     super(props);
-    this.toggleMicronutrientDisplay = this.toggleMicronutrientDisplay.bind(this);
     this.state = {listIsShowing: false};
   }
 
-  toggleMicronutrientDisplay() {
+  toggleMicronutrientDisplay = () => {
     if (Object.keys(this.props.metrics).length) {
       (this.state.listIsShowing) ? this.setState({listIsShowing: false}) : this.setState({listIsShowing: true});
     }
@@ -25,7 +24,7 @@ class MicroNutrientsTracker extends Component {
     return (
       <div className="card mb-4">
         <div className="card-body">
-          <div className= "flex-space-between">
+          <div className= "d-flex justify-content-between">
             <p className="vcenter">MICRONUTRIENTS</p>
             <button onClick= {this.toggleMicronutrientDisplay}
                     className= "btn btn-success">

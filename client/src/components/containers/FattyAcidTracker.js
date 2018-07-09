@@ -1,17 +1,24 @@
 import React, {Component} from 'react';
 
+const circleCard = {
+  color: "white",
+  height: "115px",
+  width: "115px",
+  textAlign: "center",
+  borderRadius: "50%"
+}
+
 class FattyAcidTracker extends Component {
   constructor(props) {
     super(props);
-    this.toggleDisplay = this.toggleDisplay.bind(this);
     this.state = {listIsShowing: false};
   }
 
-  toggleDisplay() {
+  toggleDisplay = () => {
     (this.state.listIsShowing) ? this.setState({listIsShowing: false}) : this.setState({listIsShowing: true});
   }
 
-  oneDecimal(value) {
+  oneDecimal = (value) => {
     return Math.round(value*10)/10;
   }
 
@@ -19,6 +26,7 @@ class FattyAcidTracker extends Component {
     const listIsShowing = this.state.listIsShowing;
     const nutritionData = this.props.nutritionData;
     const fattyAcidSums = {"omega3": 0, "omega6": 0, "omega9": 0}
+    let fattyAcidRatio;
 
     nutritionData.forEach((foodItem) => {
       for (let metric in foodItem) {
@@ -34,10 +42,12 @@ class FattyAcidTracker extends Component {
       }
     });
 
+    fattyAcidRatio = fattyAcidSums.omega6/fattyAcidSums.omega3;
+
     return (
       <div className="card">
         <div className="card-body">
-          <div className = "flex-space-between my-2">
+          <div className = "d-flex justify-content-between my-2">
             <p className="vcenter">FATTY ACID RATIO</p>
             <button onClick= {this.toggleDisplay}
                     className= "btn btn-success">
@@ -46,11 +56,30 @@ class FattyAcidTracker extends Component {
           </div>
           {(listIsShowing)
             ? <div className="card">
-                <div className="card-body">
-                  Omega 3: {this.oneDecimal(fattyAcidSums.omega3)} grams <br/>
-                  Omega 6: {this.oneDecimal(fattyAcidSums.omega6)} grams <br/>
-                  Omega 9: {this.oneDecimal(fattyAcidSums.omega9)} grams <br/>
-                  Your Omega 6:3 Ratio is {this.oneDecimal(fattyAcidSums.omega6/fattyAcidSums.omega3)}
+                <div className= "card-body">
+                  <div className= "d-flex flex-column flex-sm-row justify-content-around align-items-center">
+                    <div className= "d-flex flex-column justify-content-center accentColorBackground "
+                         style={circleCard}>
+                      <div>Omega 3</div>
+                      <div>{this.oneDecimal(fattyAcidSums.omega3)} grams</div>
+                    </div>
+                    <div className= "d-flex flex-column justify-content-center accentColorBackground my-4 my-sm-0"
+                         style={circleCard}>
+                      <div>Omega 6</div>
+                      <div>{this.oneDecimal(fattyAcidSums.omega6)} grams</div>
+                    </div>
+                    <div className= "d-flex flex-column justify-content-center accentColorBackground"
+                         style={circleCard}>
+                      <div>Omega 9 </div>
+                      <div>{this.oneDecimal(fattyAcidSums.omega9)} grams</div>
+                    </div>
+                  </div>
+                  <div className="alert alert-info my-4">
+                    Your Omega 6:3 Ratio is {this.oneDecimal(fattyAcidRatio)}
+                  </div>
+                  <div className="my-2">
+                    An Omega 6:3 ratio of 4:1 or less is ideal!
+                  </div>
                 </div>
               </div>
             : null

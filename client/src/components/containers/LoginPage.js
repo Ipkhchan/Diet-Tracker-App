@@ -5,11 +5,10 @@ import $ from 'jquery';
 class LoginPage extends Component {
   constructor(props) {
     super(props);
-    this.handleSubmit = this.handleSubmit.bind(this);
     this.state = {alert: {success: false, message: ''}}
   }
 
-  handleSubmit(e) {
+  handleLogin = (e) => {
     e.preventDefault();
     const formData = $('.loginForm').serializeArray();
     $.ajax({
@@ -18,7 +17,6 @@ class LoginPage extends Component {
       processData: 'false',
       data: formData
     }).then((res) => {
-      console.log(res);
       if(res.success) {
         localStorage.setItem('token', res.token);
         this.props.dispatch({type: 'TOGGLE'});
@@ -30,14 +28,13 @@ class LoginPage extends Component {
   render() {
     const alert = this.state.alert;
 
-
     return(
       <div className="px-2 px-sm-5">
         {(alert.message.length)
           ? <p className={`alert ${(alert.success) ? "alert-success" : "alert-danger"}`}>{alert.message}</p>
           : null
         }
-        {(alert.success == false)
+        {(alert.success === false)
           ?<form className="loginForm">
             <div className="form-group">
               <label>Username: </label>
@@ -48,7 +45,7 @@ class LoginPage extends Component {
               <input className="form-control" type="text" name="password"></input>
             </div>
             <div className="d-flex justify-content-end">
-              <input className="btn btn-primary" type="submit" value="submit" onClick={this.handleSubmit}/>
+              <input className="btn btn-primary" type="submit" value="submit" onClick={this.handleLogin}/>
             </div>
           </form>
           : null

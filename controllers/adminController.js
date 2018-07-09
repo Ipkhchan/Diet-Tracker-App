@@ -12,10 +12,6 @@ module.exports.save_RDISet = function(req, res, next) {
   const rdiSetSent = req.body;
   let existingRDISources = [];
 
-  // res.append('Access-Control-Allow-Origin', ['*']);
-  // res.append('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
-  // res.append('Access-Control-Allow-Headers', 'Content-Type');
-
   function createRDISet(message) {
     rdiCollection.create(rdiSetSent, function(err) {
       if (err) {next(err);}
@@ -55,19 +51,13 @@ module.exports.save_RDISet = function(req, res, next) {
 };
 
 module.exports.save_foodData = function(req, res, next) {
-  console.log("here");
   const foodData = req.body.data;
-  console.log(foodData);
-  // console.log(foodData);
+
   for(let foodItem of foodData) {
-    console.log(foodItem.name);
     foodDataCollection.create(foodItem, function(err) {
       if(err) {return next(err);}
     })
   };
-  // res.append('Access-Control-Allow-Origin', ['*']);
-  // res.append('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
-  // res.append('Access-Control-Allow-Headers', 'Content-Type');
   res.send("done");
 }
 
@@ -82,12 +72,6 @@ module.exports.signup_User = [
   check('age', "Age must be a number!").custom((value) => !isNaN(value)),
 
   (req,res,next) => {
-    // res.append('Access-Control-Allow-Origin', ['*']);
-    // res.append('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
-    // res.append('Access-Control-Allow-Headers', 'Content-Type');
-
-    // console.log(req.body);
-
     const errors = validationResult(req);
 
     if(!errors.isEmpty()) {
@@ -113,7 +97,6 @@ module.exports.signup_User = [
 ];
 
 module.exports.login_User = function(req, res, next) {
-  console.log("req", req.body);
   if (!req.body.password.length) {
     res.json({
       success: false,
@@ -145,28 +128,3 @@ module.exports.login_User = function(req, res, next) {
     });
   })(req, res, next);
 };
-
-
-// console.log("arguments", arguments);
-// if (err) { return next(err); }
-// if (!user) { return res.redirect('http://localhost:3000/admin/login'); }
-// req.logIn(user, function(err) {
-//   if (err) { return next(err); }
-//   return res.redirect('http://localhost:3000/');
-// });
-
-
-  // const firstName = req.body.firstName;
-  // const lastName = req.body.lastName;
-  // const email= req.body.email;
-  // const username = req.body.username;
-  // const password = req.body.password;
-
-
-//
-//   console.log(firstName);
-//   res.append('Access-Control-Allow-Origin', ['*']);
-//   res.append('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
-//   res.append('Access-Control-Allow-Headers', 'Content-Type');
-//   res.send("morency");
-// }

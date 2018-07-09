@@ -78,4 +78,3 @@ var UserDailyDietSchema = new Schema({
 });
 
 module.exports = mongoose.model('UserDailyDiet', UserDailyDietSchema);
-// module.exports.foodItemCollection = mongoose.model('FoodItem', UserDailyDietSchema);

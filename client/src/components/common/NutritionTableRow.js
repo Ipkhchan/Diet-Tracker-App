@@ -3,6 +3,7 @@ import React from 'react';
 const NutritionTableRow = (props) => {
     const foodItem= props.foodItem;
     const headers = props.headers;
+    
     return (
       <tr>
         {headers.map((header) =>

@@ -2,12 +2,7 @@ import React, {Component} from 'react'
 import $ from 'jquery';
 
 class AdminMetricsPage extends Component {
-  constructor(props) {
-    super(props);
-    this.handleSubmit = this.handleSubmit.bind(this);
-  }
-
-  handleSubmit(e) {
+  handleSubmit = (e) => {
     e.preventDefault();
     const formData = $('.rdiForm').serializeArray();
     const postData = {};
@@ -27,8 +22,6 @@ class AdminMetricsPage extends Component {
   }
 
   render() {
-    console.log(this.props.metrics);
-
     return(
       <form className="rdiForm" onSubmit={this.handleSubmit}>
         {this.props.metrics.map((metric) =>

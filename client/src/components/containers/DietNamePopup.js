@@ -6,10 +6,14 @@ class DietNamePopup extends Component {
   }
 
   render() {
+    const toggleShowDietNamePopup = this.props.toggleShowDietNamePopup;
+
     return (
       <div className="centered-popup card" style ={{"background": "white", "z-index": "1"}}>
         <div className="d-flex justify-content-end px-2 mt-2">
-          <button className="btn btn-sm btn-dark" onClick={this.props.toggleShowDietNamePopup}>X</button>
+          <button type="button" onClick={toggleShowDietNamePopup} className="close" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
         </div>
         <div className= "card-body">
           <p>Enter a Name for your Diet: </p>

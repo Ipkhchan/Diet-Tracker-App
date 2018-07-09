@@ -28,9 +28,8 @@ html {
 * {
    box-sizing: border-box;
    /* border-style: solid; */
-    font-family: 'Poppins', sans-serif;
+   font-family: 'Poppins', sans-serif;
 }
-
 
 /*Defined an extra .col-4a class because most of the rows/elements on the page are in 3 columns. A width of 31.5% gives that perfect spacing in between the columns. Applying justify-content of space-between spaces them perfectly, instead of having to play around with margins and padding. */
 
@@ -59,112 +58,20 @@ html {
     flex-direction: column;
 }
 
-a {
-    text-decoration: none;
-    color: #000000;
-}
-
 /*VARIABLES*/
 /*variable to change accent color for whole page*/
 :root {
     --accentColor: #7FC788;
 }
 
-/* .searchBar {
-  display: flex;
-  justify-content: flex-start;
-}
-
-.searchIcon svg:hover {
-  fill: var(--accentColor);
-} */
-
-.foodItem {
-  justify-content: space-between;
-
-}
-
-.itemWeight {
-  width: 50px;
-}
-
-.itemQuantity {
-  width: 30px;
-}
-
-.selectedItemEdits > * {
-  margin: 0 5px;
-}
-
-.rdiForm > * {
-  display: block;
-}
-
-.block > * {
-  display: block;
-}
-
-.flex-space-between {
-  display: flex;
-  justify-content: space-between;
-}
-
-.flex {
-  display: flex;
+a {
+  color: black;
 }
 
 .accentColorBackground {
   background: var(--accentColor);
 }
 
-/* .row-0 {
-    margin: 0;
-    background-color: #222222;
-    position: relative;
-    justify-content: flex-end;
-}
-
-.row-0 .topnav{
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.row-0 li {
-    display: flex;
-    align-items: center;
-    height: 35px;
-}
-
-.row-0 a {
-    color: #ffffff;
-    font-size: 11px;
-    margin: 0 1vw;
-}
-
-.row-0 a:hover {
-    color: var(--accentColor);
-}
-
-.row-0 .menuBar {
-    font-size: 15px;
-    display: none;
-}
-
-.row-0 input {
-    /* width: 25vw; */
-    /* min-width: 100px;
-    max-width: 200px;
-    background-color: #333333;
-    color: #999999;
-    font-size: 12px;
-    font-weight: bold;
-    border: none;
-    padding-left: 10px;
-
-} */
-
-/* for pop-ups that need to be centered */
 .centered-popup {
   position: fixed;
   top: 50%;

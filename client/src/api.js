@@ -1,22 +1,20 @@
 import $ from 'jquery';
+//module that handles requests to Nutritionix and extracts food data in a form
+//useable for DietTrackApp.
+//API:
+//dietTracker.getItem() takes as argument a food item and returns a list of 5 closest results
+//dietTracker.getNutrients() takes as argument a food item and returns an object
+//containing nutrition data about that food item
 
 const dietTracker = {};
-//module variables that are exposed. TODO: research if there should be any global
-//modules in variables. If not, how can external programs access those variables?
 dietTracker.searchResults = [];
 dietTracker.nutrientTracker = [];
-//this collects the names of the selected food items that the user makes changes
-//to so that we can update those food items when saving.
-// dietTracker.itemsUpdated = [];
 
 //IDs and Keys
 dietTracker.Id = "3c51cd82"
 dietTracker.key = "bd1ba708718f85892c404d8bd8cc48b2"
 
-//TODO: add error handling
-//search Nutritionix database
 dietTracker.getItem = function(itemName) {
-  //make an AJAX GET request
   return $.ajax({
     url: 'https://trackapi.nutritionix.com/v2/search/instant',
     method:'GET',
@@ -36,28 +34,7 @@ dietTracker.getItem = function(itemName) {
   })
 };
 
-// dietTracker.getItemNatural = function(itemName) {
-//   return $.ajax({
-//     url: 'https://trackapi.nutritionix.com/v2/natural/nutrients',
-//     method:'GET',
-//     dataType:'JSON',
-//     headers: {
-//       "x-app-id": dietTracker.Id,
-//       "x-app-key": dietTracker.key
-//     },
-//     data: {
-//       query: itemName,
-//       branded: "false",
-//     }
-//   })
-//   .then(function(res) {
-//     //return the first 5 search results.
-//     return res;
-//   })
-// };
-
 dietTracker.getNutrients = function(itemName) {
-  //make AJAX POST request to get nutritional information
   return $.ajax({
     url: 'https://trackapi.nutritionix.com/v2/natural/nutrients',
     method:'POST',
@@ -71,13 +48,13 @@ dietTracker.getNutrients = function(itemName) {
     }
   }).then(function(res) {
     // return res;
+    console.log("fooddata", res);
+    console.log("serving quantity", res.foods[0]["serving_qty"]);
     return dietTracker.addNutrientInfo(res);
   });
 };
 
 //filters the nutrients that you want to track from Nutritionix's API response
-//TODO: desired nutrients should be fed into to dietTracker. It should be external
-//to the module
 dietTracker.filterTrackedNutrients = function(nutrient) {
   if ([203, 204, 205, 208, 291, 301, 303, 304, 305, 306, 307, 309, 312, 313, 315, 317,
         318, 321, 322, 323, 324, 325, 326, 401, 404, 405, 406, 410, 415, 417, 418, 421, 430,
@@ -233,20 +210,9 @@ dietTracker.nutrientUnits = {"protein": "g",
                             "fatty-acids-monounsaturated":"g",
                             "fatty-acids-polyunsaturated":"g"
                             }
-//create object that stores all selected food items and their nutritional information.
-// dietTracker.nutrientTracker = {};
-
-//NutritionInfo Object Structure
-//{food1: {name: name, amount: value, protein:value, fat: value, cals: value, carb: value},
-// food2: {name: name, amount: value, protein:value, fat: value, cals: value, carb: value}}
-//
-//
-//
-//
-//
 
 
-//Store/add nutrient info for a single food item to nutrientTracker object.
+//accepts nutrition data from Nutritionix and re-formats it to match DietTrackApp requirements.
 //Requires 2 parameters (nutrientInfo (straight from Nutritionix API) and name of food item)
 //TODO: the algorithm for filtering this array could probably be improved. Can do in 1 step
 dietTracker.addNutrientInfo = function(searchResults) {
@@ -256,7 +222,7 @@ dietTracker.addNutrientInfo = function(searchResults) {
     let nutrientInfo = searchResults.foods[i].full_nutrients.filter(nutrient => dietTracker.filterTrackedNutrients(nutrient));
 
     let foodData = {};
-    foodData.quantity = 1;
+    foodData.quantity = (searchResults.foods[i].serving_unit === "grams") ? 1 : searchResults.foods[i].serving_qty;
     foodData.amount = searchResults.foods[i].serving_weight_grams;
     foodData.name = searchResults.foods[i].food_name;
 
@@ -272,10 +238,7 @@ dietTracker.addNutrientInfo = function(searchResults) {
     });
     foodDatas.push(foodData);
   }
-
   return foodDatas;
-  // dietTracker.nutrientTracker.push(foodData);
-  // console.log(dietTracker.nutrientTracker);
 };
 
 export default dietTracker;

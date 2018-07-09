@@ -4,11 +4,11 @@ import dietTracker from '../../api.js'
 class FoodRecommendationsList extends Component {
   constructor(props) {
     super(props);
-    this.handleListDisplay = this.handleListDisplay.bind(this);
     this.state = {foodSubListIndexStart: 0}
   }
 
-  handleListDisplay(e) {
+  //handle pagination of food recommendations (5 per page)
+  handleListDisplay = (e) => {
     const prevNext = e.target.textContent;
     const foodSubListIndexStart = this.state.foodSubListIndexStart;
     if (prevNext === "Next" && foodSubListIndexStart < 15) {
@@ -56,9 +56,5 @@ class FoodRecommendationsList extends Component {
     )
   }
 }
-
-// <p>{Math.round(100*(100* ((deficiencyAmount.rdi-deficiencyAmount.dietAmount)/foodRecommendation[deficiency])))/100 +
-//     " grams"}</p>
-
 
 export default FoodRecommendationsList

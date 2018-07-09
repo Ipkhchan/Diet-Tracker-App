@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import NutritionTableHeaders from '../common/NutritionTableHeaders'
 import NutritionTableRows from '../common/NutritionTableRows'
-import MetricsFooter from './MetricsFooter'
+import MetricsFooter from '../common/MetricsFooter'
 
 class NutritionTable extends Component {
   constructor(props) {
@@ -12,10 +12,7 @@ class NutritionTable extends Component {
   render() {
     const nutritionData = this.props.nutritionData;
     const dietTotals = this.props.dietTotals;
-    // for (const foodItem in nutritionData) {
-    //     var headers = Object.keys(nutritionData[foodItem]);
-    //     break;
-    // }
+
     return (
       <div className = "table-responsive">
         <table className="table itemTable">

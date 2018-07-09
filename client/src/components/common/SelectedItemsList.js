@@ -3,6 +3,8 @@ import React from 'react';
 //TODO: undo button to bring back "removed" item
 const SelectedItemsList = (props) => {
   const nutritionData = props.nutritionData;
+  const handleNutritionDataChange = props.handleNutritionDataChange;
+
   return (
     <div>
       <p className="font-weight-bold">Selected Items: </p>
@@ -12,7 +14,7 @@ const SelectedItemsList = (props) => {
             <p className="col-xs-12 col-md-4 my-2 px-0 vcenter">{foodItem.name}</p>
             <div className = "col-xs-12 col-md-8 d-flex flex-column flex-sm-row justify-content-end  align-items-center edits px-0 mx-0"
                  style = {{"overflowX": "auto"}}
-                 onChange = {props.handleNutritionDataChange}>
+                 onChange = {handleNutritionDataChange}>
               <div className="input-group">
                 <input type="number"
                        value={Math.round(foodItem.quantity*10)/10}
@@ -37,7 +39,7 @@ const SelectedItemsList = (props) => {
               </div>
               <button className= "btn-sm btn-danger ml-0 ml-sm-2 mt-2 mt-sm-0" id="removeItem"
                       type="button"
-                      onClick = {props.handleNutritionDataChange}
+                      onClick = {handleNutritionDataChange}
                       data-fooditem={foodItem.name}>X</button>
             </div>
           </li>

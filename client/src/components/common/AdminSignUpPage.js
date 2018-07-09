@@ -4,15 +4,13 @@ import $ from 'jquery';
 class AdminSignUpPage extends Component {
   constructor(props) {
     super(props);
-    this.handleSubmit = this.handleSubmit.bind(this);
     this.state = {errors: []}
   }
 
-  handleSubmit(e) {
-    console.log("here");
+  handleSubmit = (e) => {
     e.preventDefault();
     const formData = $('.signupForm').serializeArray();
-    console.log(formData);
+
     $.ajax({
       url: '/admin/signup',
       method:'POST',
@@ -75,7 +73,5 @@ class AdminSignUpPage extends Component {
     )
   }
 }
-
-// action="http://localhost:5000/admin/signup"
 
 export default AdminSignUpPage
