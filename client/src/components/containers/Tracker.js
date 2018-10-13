@@ -131,6 +131,7 @@ class Tracker extends Component {
   //handle changing the nutrition values based on user input food quantities
   handleNutritionDataChange = (e) => {
     const foodItem = e.target.dataset.fooditem;
+    //this is creating a reference, not a copy. Thus, you are altering state directly.
     const nutritionItems = this.state.nutritionData.items;
     const targetId = e.target.id;
     let itemData;
@@ -195,6 +196,7 @@ class Tracker extends Component {
   handleSearchItemNatural = (items = document.querySelector(".search").value) => {
     Promise.resolve(dietTracker.getNutrients(items))
       .then((foodData) => {
+        console.log(foodData);
         const existingFoodItemList = this.state.nutritionData.items.map((foodItem) => foodItem.name);
         let clashingFoodItemList = [];
         foodData = foodData.filter((foodItem) => {
@@ -418,7 +420,7 @@ class Tracker extends Component {
         }
         <div className="jumbotron py-3">
           <p>{`Welcome to healthy bodies! Get started by entering in food items from
-             your diet below or click the record button to input by voice. We'll
+             your diet below ${(window.SpeechRecognition || window.webkitSpeechRecognition ? "or click the record button to input by voice" : "")}. We'll
              gather all the information for you.`}</p>
         </div>
         <SearchBar className="searchBar" handleSearch={this.handleSearchItemNatural}
