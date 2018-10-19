@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import {connect} from 'react-redux';
 import $ from 'jquery';
-import dietTracker from '../../api.js'
+import dietTracker from '../../dietTracker.js'
 import SearchBar from './SearchBar'
 import RDISetSelector from '../common/RDISetSelector'
 import ResultsList from '../common/ResultsList'
@@ -28,11 +28,17 @@ class Tracker extends Component {
                 };
   }
 
+  componentDidUpdate() {
+    console.log("this.state", this.state);
+  }
+
   componentDidMount() {
     document.querySelector('#search').focus();
 
     Promise.all([this.getUserDiets(),this.getRDISet()])
       .then(([userDiet, rdiSet]) => {
+        console.log("userDiet", userDiet);
+        console.log("rdiSet", rdiSet);
         if (userDiet.dietNames.length) {
           this.setState({nutritionData: userDiet.defaultDiet,
                          dietTotals: this.sumDietTotals(userDiet.defaultDiet.items, rdiSet),
@@ -81,8 +87,6 @@ class Tracker extends Component {
        path = '/metrics/' + sex.value + '/' + age.value;
      }
 
-     //if user is not logged in and a specific RDI sex/age range has not between
-     //requested, ask for a default RDI set.
      else if(path === undefined) {
        path = "/metrics/default/default";
      }
@@ -132,7 +136,7 @@ class Tracker extends Component {
   handleNutritionDataChange = (e) => {
     const foodItem = e.target.dataset.fooditem;
     //this is creating a reference, not a copy. Thus, you are altering state directly.
-    const nutritionItems = this.state.nutritionData.items;
+    let nutritionItems = Object.assign({},this.state.nutritionData.items);
     const targetId = e.target.id;
     let itemData;
     let foodItemIndex;
@@ -223,10 +227,13 @@ class Tracker extends Component {
         newNutritionData.items = newNutritionData.items.concat(foodData);
         this.setState({nutritionData: newNutritionData,
                        dietTotals: this.sumDietTotals(newNutritionData.items),
-                       alertMessage: this.handleAlertMessage(alertMessage)})
+                       alertMessage: this.alertMessage(alertMessage)});
+
+        // this.handleAlertMessage(alertMessage);
       })
       .catch((error) => {
-        this.setState({alertMessage: this.handleAlertMessage(error.responseJSON.message)})
+        this.setState({alertMessage: this.alertMessage(error.responseJSON.message)})
+        // this.handleAlertMessage(error.responseJSON.message);
       })
     document.querySelector(".search").value = "";
   }
@@ -234,8 +241,10 @@ class Tracker extends Component {
   handleSelectItem = (e) => {
     const foodName = e.target.textContent;
     const foodItemList = this.state.nutritionData.items.map((foodItem) => foodItem.name);
+
     if (foodItemList.indexOf(foodName) > -1) {
-      this.setState({alertMessage: this.handleAlertMessage("This food is already in your diet!")});
+      this.setState({alertMessage: this.alertMessage("This food is already in your diet!")});
+      // this.handleAlertMessage("This food is already in your diet!");
     }
     else {
       Promise.resolve(dietTracker.getNutrients(foodName))
@@ -251,32 +260,27 @@ class Tracker extends Component {
     }
   }
 
-  handleVoiceSearch = (done) => {
-      // const recordButton = document.querySelector('#recordButton');
+  handleVoiceSearch = () => {
+      const voiceSearch = speechRecognition.listen();
 
-      speechRecognition.listen()
-        .then(transcript => {
+      voiceSearch.then(transcript => {
           this.handleSearchItemNatural(transcript);
         })
-        .then(() => {
-          done();
-        })
-        .catch(error => {
-          done();
-        })
+
+      return voiceSearch;
   }
 
   handleGetRDISet = (e) => {
     e.preventDefault();
     Promise.resolve(this.getRDISet(e))
       .then((rdiSet)=> {
-        console.log("there");
         this.setState({metrics: rdiSet,
                        showRDISetForm: false,
                        dietTotals: this.sumDietTotals(undefined, rdiSet)});
       })
       .catch((err)=> {
         this.alertMessage(err);
+        // this.handleAlertMessage(err);
       })
   }
 
@@ -325,7 +329,8 @@ class Tracker extends Component {
     }
 
     else {
-      this.setState({alertMessage: this.handleAlertMessage("No items to Save!")});
+      this.setState({alertMessage: this.alertMessage("No items to Save!")});
+      // this.handleAlertMessage("No items to Save!");
       return;
     }
 
@@ -339,7 +344,9 @@ class Tracker extends Component {
     }).then((res) => {
       this.setState({nutritionData: res.nutritionData,
                      dietNames: res.dietNames,
-                     alertMessage: this.handleAlertMessage(res.message)});
+                     alertMessage: this.alertMessage(res.message)});
+
+      // this.handleAlertMessage(res.message);
     });
   }
 
@@ -350,7 +357,10 @@ class Tracker extends Component {
       method:'GET',
       dataType:'JSON',
     }).then((res) => {
-      this.setState({dietNames: res.dietNames, alertMessage: this.handleAlertMessage(res.message)});
+      this.setState({dietNames: res.dietNames,
+                     alertMessage: this.alertMessage(res.message)});
+
+      // this.handleAlertMessage(res.message);
     });
   }
 
@@ -368,7 +378,8 @@ class Tracker extends Component {
       this.setState({showDietNamePopup: true})
     }
     else  {
-      this.setState({alertMessage: this.handleAlertMessage("You haven't selected any items to save yet!")})
+      this.setState({alertMessage: this.alertMessage("You haven't selected any items to save yet!")});
+      // this.handleAlertMessage("You haven't selected any items to save yet!")
     }
   }
 
@@ -390,19 +401,25 @@ class Tracker extends Component {
     this.setState({showRDISetForm: !this.state.showRDISetForm});
   }
 
-  handleAlertMessage = (alertMessage, displayTime = 1000) => {
+
+  //for calls from within component
+  alertMessage = (alertMessage, displayTime = 1000) => {
     //if no alertMessage is passed, that means there should be no alert message shown
     if (!alertMessage) {
       this.setState({alertMessage: null})
     }
     //else set a timeout for the alert message to fade in 1 second.
     else {
-      setTimeout(() => {this.setState({alertMessage: null})}, displayTime);
+      // this.setState({alertMessage: alertMessage});
+      setTimeout(() => {
+        this.setState({alertMessage: null});
+      }, displayTime);
       return alertMessage;
     }
   }
 
-  alertMessage = (alertMessage, displayTime = 1000) => {
+  // for calls from other components
+  handleAlertMessage = (alertMessage, displayTime = 1000) => {
     this.setState({alertMessage: this.handleAlertMessage(alertMessage, displayTime)});
   }
 
@@ -496,7 +513,7 @@ class Tracker extends Component {
                 <MicroNutrientsTracker nutritionData={this.state.nutritionData.items}
                                        dietTotals={this.state.dietTotals}
                                        metrics={this.state.metrics}
-                                       alertMessage = {this.alertMessage}
+                                       handleAlertMessage = {this.handleAlertMessage}
 
                 />
             </div>

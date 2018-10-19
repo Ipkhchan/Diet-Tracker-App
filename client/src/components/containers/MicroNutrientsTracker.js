@@ -12,7 +12,7 @@ class MicroNutrientsTracker extends Component {
       (this.state.listIsShowing) ? this.setState({listIsShowing: false}) : this.setState({listIsShowing: true});
     }
     else {
-      this.props.alertMessage('Enter your gender and age above to get your recommended daily intakes!', 3000);
+      this.props.handleAlertMessage('Enter your gender and age above to get your recommended daily intakes!', 3000);
     }
   }
 

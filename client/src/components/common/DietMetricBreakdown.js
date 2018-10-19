@@ -1,5 +1,5 @@
 import React from 'react'
-import dietTracker from '../../api.js'
+import dietTracker from '../../dietTracker.js'
 
 const DietMetricBreakdown = (props) => {
   const nutritionData = props.nutritionData;

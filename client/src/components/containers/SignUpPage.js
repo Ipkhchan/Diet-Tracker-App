@@ -1,7 +1,7 @@
 import React,{Component} from 'react';
 import $ from 'jquery';
 
-class AdminSignUpPage extends Component {
+class SignUpPage extends Component {
   constructor(props) {
     super(props);
     this.state = {errors: []}
@@ -74,4 +74,4 @@ class AdminSignUpPage extends Component {
   }
 }
 
-export default AdminSignUpPage
+export default SignUpPage

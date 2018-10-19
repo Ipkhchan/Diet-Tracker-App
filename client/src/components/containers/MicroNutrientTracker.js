@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import $ from 'jquery';
 import FoodRecommendationsList from './FoodRecommendationsList';
 import DietMetricBreakdown from '../common/DietMetricBreakdown';
-import dietTracker from '../../api.js'
+import dietTracker from '../../dietTracker.js'
 
 class MicroNutrientTracker extends Component {
   constructor(props) {

@@ -9,8 +9,8 @@ import {
 import './App.css';
 import AdminMetricsPage from './components/containers/AdminMetricsPage'
 import NotFound from './components/containers/AdminMetricsPage'
-import AdminSignUpPage from './components/common/AdminSignUpPage'
-import AdminSignUpSuccess from './components/common/AdminSignUpSuccess'
+import SignUpPage from './components/containers/SignUpPage'
+import SignUpSuccess from './components/common/SignUpSuccess'
 import LoginPage from './components/containers/LoginPage'
 import Tracker from './components/containers/Tracker'
 import Footer from './components/common/Footer'
@@ -83,8 +83,8 @@ class App extends Component {
         <Router>
           <Switch>
               <Route exact path="/" render={()=><Tracker metrics={metrics} isLoggedIn={this.state.isLoggedIn}/>}/>
-              <Route path="/admin/signup" render={()=><AdminSignUpPage/>} />
-              <Route path="/admin/signupSuccess" render={()=><AdminSignUpSuccess/>}/>
+              <Route path="/admin/signup" render={()=><SignUpPage/>} />
+              <Route path="/admin/signupSuccess" render={()=><SignUpSuccess/>}/>
               <Route path="/admin/login" render={()=><LoginPage/>}/>
               <Route path="/admin/metrics" render={()=><AdminMetricsPage metrics={metrics}/>}/>
               <Route path="*" component={NotFound} />

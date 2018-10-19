@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import dietTracker from '../../api.js'
+import dietTracker from '../../dietTracker.js'
 
 class FoodRecommendationsList extends Component {
   constructor(props) {

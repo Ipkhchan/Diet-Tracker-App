@@ -49,6 +49,7 @@ class SearchBar extends Component {
   }
 
   handleVoiceSearch = (e) => {
+    console.log("SearchBar");
     e.preventDefault();
     let styleSheet = document.styleSheets[0];
     let newMicrophoneStyle = Object.assign({}, this.state.microphoneStyle);
@@ -69,10 +70,12 @@ class SearchBar extends Component {
       newMicrophoneStyle.animationIterationCount= 'infinite';
       this.setState({microphoneStyle: newMicrophoneStyle,
                      isVoiceSearching: true});
-      this.props.handleVoiceSearch(() => {
-        styleSheet.removeRule(styleSheet.cssRules.length-1);
-        this.setState({isVoiceSearching: false});
-      });
+
+      this.props.handleVoiceSearch()
+        .then(() => {
+          styleSheet.removeRule(styleSheet.cssRules.length-1);
+          this.setState({isVoiceSearching: false});
+        });
     }
     else {
       speechRecognition.stop();
@@ -82,19 +85,19 @@ class SearchBar extends Component {
     }
   }
 
-  handleSuccess = (stream) => {
-    var context = new AudioContext();
-    var source = context.createMediaStreamSource(stream);
-    var processor = context.createScriptProcessor(1024, 1, 1);
-
-    source.connect(processor);
-    processor.connect(context.destination);
-
-    processor.onaudioprocess = function(e) {
-      // Do something with the data, i.e Convert this to WAV
-      console.log(e.inputBuffer);
-    };
-  }
+  // handleSuccess = (stream) => {
+  //   var context = new AudioContext();
+  //   var source = context.createMediaStreamSource(stream);
+  //   var processor = context.createScriptProcessor(1024, 1, 1);
+  //
+  //   source.connect(processor);
+  //   processor.connect(context.destination);
+  //
+  //   processor.onaudioprocess = function(e) {
+  //     // Do something with the data, i.e Convert this to WAV
+  //     console.log(e.inputBuffer);
+  //   };
+  // }
 
   // callWatson = (audio) => {
   //   console.log("audio", audio);
